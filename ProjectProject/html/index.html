@@ -2,12 +2,12 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>PMS Project View</title>
 
 <script type="text/javascript">
 function initialize() {
   
-   // get all constants
+   // get all projects
    refreshProjectsList();
    
 }
@@ -21,11 +21,11 @@ function initialize() {
 <form name="createForm" method="post">
    <input name="projectName" value="projectName"/>
   
-   <input type="button" id="createButton" value="Create Constant" onClick="JavaScript:handleCreateClick(this)">
-<br>   <input type="checkbox" name="system">Create System Constant<br>
+   <input type="button" id="createButton" value="Create Project" onClick="JavaScript:handleCreateClick(this)">
+<br>   <input type="checkbox" name="system">Create System Project<br>
 </form>
 
-<div id="constantList"></div>
+<div id="projectList"></div>
 
 </body>
 </html>

@@ -4,7 +4,7 @@
  *    GET list_url
  *    RESPONSE  list of [name, value, system] constants 
  */
-function refreshConstantsList() {
+function refreshProjectsList() {
    var xhr = new XMLHttpRequest();
    xhr.open("GET", list_url, true);
    xhr.send();

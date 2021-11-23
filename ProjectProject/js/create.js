@@ -15,8 +15,6 @@ function handleCreateClick(e) {
   if (form.system.checked) {  // be sure to flag system constant requests...
      data["system"] = true;
   }
-  
-  data["value"] = form.constantValue.value;
 
   var js = JSON.stringify(data);
   console.log("JS:" + js);
