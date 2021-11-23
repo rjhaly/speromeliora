@@ -3,8 +3,29 @@
 <head>
 <meta charset="UTF-8">
 <title>Insert title here</title>
+
+<script type="text/javascript">
+function initialize() {
+  
+   // get all constants
+   refreshProjectsList();
+   
+}
+</script>
+
 </head>
-<body>
+<body onload="initialize()">
+
+<h2>Projects</h2>
+
+<form name="createForm" method="post">
+   <input name="projectName" value="projectName"/>
+  
+   <input type="button" id="createButton" value="Create Constant" onClick="JavaScript:handleCreateClick(this)">
+<br>   <input type="checkbox" name="system">Create System Constant<br>
+</form>
+
+<div id="constantList"></div>
 
 </body>
 </html>
