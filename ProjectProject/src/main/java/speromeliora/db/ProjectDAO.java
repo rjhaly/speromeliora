@@ -89,4 +89,58 @@ public class ProjectDAO {
             throw new Exception("Unable to retrieve Project: " + e.getMessage());
         }
     }
+    public void archiveProject(String pid) throws Exception {
+        try {
+            PreparedStatement ps = conn.prepareStatement("UPDATE projects SET isArchived = true WHERE pid = ?;");
+            ps.setString(1, pid);
+            ps.execute();
+        } catch (Exception e) {
+            throw new Exception("Failed to archive project: " + e.getMessage());
+        }
+    }
+    
+    public void deleteProject(String pid) throws Exception {
+        try {
+            PreparedStatement ps = conn.prepareStatement("DELETE FROM projects WHERE pid = ?;");
+            ps.setString(1, pid);
+            ps.execute();
+        } catch (Exception e) {
+            throw new Exception("Failed to delete project: " + e.getMessage());
+        }
+    }
+    public ArrayList<Project> listProjects() throws Exception{
+    	ArrayList<Project> projects = new ArrayList<Project>();
+    	try {
+            PreparedStatement ps = conn.prepareStatement("SELECT * FROM projects;");
+            ResultSet resultSet = ps.executeQuery();
+            
+            while(resultSet.next()) {
+            	String pid = resultSet.getString("pid");
+            	boolean isArchived = resultSet.getBoolean("isArchived");
+            	ArrayList<String> tasks = new ArrayList<>();
+            	ArrayList<String> teammates= new ArrayList<>();
+            	
+            	PreparedStatement ps1 = conn.prepareStatement("SELECT * FROM lookup_table WHERE pid = ?;");
+            	ps1.setString(1, pid);
+            	ResultSet resultSet1 = ps1.executeQuery();
+            	
+            	while(resultSet1.next()) {
+            		String attribute;
+            		if((attribute = resultSet1.getString("tsk_id")) != null) {
+            			tasks.add(attribute);
+            		}
+            		else {
+            			attribute = resultSet1.getNString("tmt_id");
+            			teammates.add(attribute);
+            		}
+            	}
+            	Project project = new Project(pid, tasks, teammates, isArchived);
+            	projects.add(project);
+            }
+            return projects;
+            
+        } catch (Exception e) {
+            throw new Exception("Unable to retrieve Project: " + e.getMessage());
+        }
+    }
 }

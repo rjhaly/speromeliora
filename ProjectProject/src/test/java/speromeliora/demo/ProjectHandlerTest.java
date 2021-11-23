@@ -22,9 +22,14 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3Object;
 import com.google.gson.Gson;
 
+import speromeliora.http.ArchiveProjectRequest;
+import speromeliora.http.ArchiveProjectResponse;
 import speromeliora.http.CreateProjectRequest;
 import speromeliora.http.CreateProjectResponse;
+import speromeliora.http.DeleteProjectRequest;
+import speromeliora.http.DeleteProjectResponse;
 import speromeliora.http.GetProjectResponse;
+import speromeliora.http.ListProjectResponse;
 import speromeliora.model.Project;
 
 /**
@@ -65,6 +70,15 @@ public class ProjectHandlerTest extends LambdaTest{
         Assert.assertEquals(outgoing.getIsArchived(), response.project.getIsArchived());
         Assert.assertEquals(200, response.statusCode);
     }
+    
+    void testArchiveInput(String incoming, String outgoing) throws IOException {
+    	ArchiveProjectHandler handler = new ArchiveProjectHandler();
+    	ArchiveProjectRequest req = new Gson().fromJson(incoming, ArchiveProjectRequest.class);
+        ArchiveProjectResponse response = handler.handleRequest(req, createContext("compute"));
+
+        Assert.assertEquals(outgoing, response.projectID);
+        Assert.assertEquals(200, response.statusCode);
+    }
 
     @Test
     public void testprojectHandler() {
@@ -87,5 +101,46 @@ public class ProjectHandlerTest extends LambdaTest{
         } catch (IOException ioe) {
         	Assert.fail("Invalid:" + ioe.getMessage());
         }
+    }
+    @Test
+    public void testArchiveProjectHandler() {
+    	String SAMPLE_INPUT_STRING = "{\"arg1\": \"project1\"}";
+        String RESULT = "project1";
+        
+        try {
+        	testArchiveInput(SAMPLE_INPUT_STRING, RESULT);
+        } catch (IOException ioe) {
+        	Assert.fail("Invalid:" + ioe.getMessage());
+        }
+    }
+    
+    @Test
+    public void testDeleteProjectHandler() {
+    	String SAMPLE_INPUT_STRING = "{\"arg1\": \"project1\"}";
+        int RESULT = 200;
+        
+        DeleteProjectHandler handler = new DeleteProjectHandler();
+		DeleteProjectRequest req = new Gson().fromJson(SAMPLE_INPUT_STRING, DeleteProjectRequest.class);
+		DeleteProjectResponse response = handler.handleRequest(req, createContext("compute"));
+
+		Assert.assertEquals(RESULT, response.statusCode);
+		Assert.assertEquals(200, response.statusCode);
+    }
+    
+    @Test
+    public void testListProjectHandler() {
+    	String SAMPLE_INPUT_STRING = "{\"arg1\": \"project1\"}";
+        Project project = new Project("project1", new ArrayList<String>(), new ArrayList<String>(), false);
+        ArrayList<Project> testProjies = new ArrayList<>();
+        testProjies.add(project);
+        ListProjectHandler handler = new ListProjectHandler();
+		ListProjectResponse response = handler.handleRequest(SAMPLE_INPUT_STRING, createContext("compute"));
+		for(int i = 0; i < testProjies.size(); i++) {
+		 Assert.assertEquals(testProjies.get(i).getPid(), response.projects.get(i).getPid());
+		 Assert.assertEquals(testProjies.get(i).getTeammates(), response.projects.get(i).getTeammates());
+		 Assert.assertEquals(testProjies.get(i).getIsArchived(), response.projects.get(i).getIsArchived());
+		 Assert.assertEquals(testProjies.get(i).getTasks(), response.projects.get(i).getTasks());
+	        Assert.assertEquals(200, response.statusCode);
+		}
     }
 }
