@@ -143,4 +143,44 @@ public class ProjectDAO {
             throw new Exception("Unable to retrieve Project: " + e.getMessage());
         }
     }
+    public ArrayList<Task> addTasks(ArrayList<String> tasks, String parentTask) throws Exception {
+        try {
+        	ArrayList<Task> newTasks = new ArrayList<Task>();
+        	for(int i = 0; i < tasks.size(); i++) {
+        		Task task = new Task();
+        		task.setIsBottomLevel(true);;
+        		task.setIsCompleted(false);
+        		task.setSubTasks(new ArrayList<String>());
+        		task.setTeammates(new ArrayList<String>());
+        		task.setName(tasks.get(i));
+        		PreparedStatement ps = conn.prepareStatement(
+        				"INSERT INTO tasks (tsk_name, isComplete, isBottomLevel, parent_tsk_id, tsk_identifier) "
+        				+ "values(?,false,true,?,?);");
+        		ps.setString(1,  tasks.get(i));
+        		if(parentTask != "") {
+        			ps.setNString(2, parentTask);
+        			PreparedStatement ps1 = conn.prepareStatement("SELECT * FROM projects WHERE tsk_id = ?;");
+                    ps1.setString(1, parentTask);
+                    ResultSet resultSet = ps.executeQuery();
+                    String identifier ="" + resultSet.getString("tsk_identifier") + "." + i;
+                    ps.setNString(3, identifier);
+                    task.setTaskIdentifier(identifier);
+        		}
+        		else {
+        			ps.setNString(2, null);
+        			ps.setNString(3, i + "");
+        			task.setTaskIdentifier(i + "");
+        		}
+	            ps.execute();
+	            ps = conn.prepareStatement("SELECT * FROM tasks WHERE tsk_id=(SELECT max(tsk_id) FROM tasks);");
+	            ResultSet resultSet = ps.executeQuery();
+	            String taskID = resultSet.getNString("tsk_id");
+	            task.setTaskID(taskID);
+	            newTasks.add(task);
+        	}
+        	return newTasks;
+        } catch (Exception e) {
+            throw new Exception("Failed to add task: " + e.getMessage());
+        }
+    }
 }
