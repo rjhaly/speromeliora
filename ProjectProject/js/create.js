@@ -10,11 +10,7 @@ function handleCreateClick(e) {
   var form = document.createForm;
  
   var data = {};
-  data["name"] = form.projectName.value;
-  
-  if (form.system.checked) {  // be sure to flag system constant requests...
-     data["system"] = true;
-  }
+  data["name"] = form.projectName;
 
   var js = JSON.stringify(data);
   console.log("JS:" + js);
