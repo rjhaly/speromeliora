@@ -1,9 +1,16 @@
-function processCreateResponse(arg1) {
+function processCreateResponse(result) {
   // Can grab any DIV or SPAN HTML element and can then manipulate its
   // contents dynamically via javascript
   console.log("project name:" + arg1);
 
-  refreshProjectsList();
+  var js = JSON.parse(result);
+  var proj = document.getElementById("createProjectDisplay");
+
+  var output = "";
+  var projectJson = js.list[1];
+  console.log(projectJson);
+
+  projList.innerHTML = projectJson;
 }
 
 function handleCreateClick(e) {

@@ -10,7 +10,7 @@ function processGetResponse(result) {
   console.log("res:" + result);
   // Can grab any DIV or SPAN HTML element and can then manipulate its contents dynamically via javascript
   var js = JSON.parse(result);
-  var proj = document.getElementById('project');
+  var proj = document.getElementById('getProjectDisplay');
   
   var output = "";
   for (var i = 0; i < js.list.length; i++) {
@@ -24,6 +24,7 @@ function processGetResponse(result) {
   // Update computation result
   projList.innerHTML = output;
 }
+
 function handleGetProjectClick(e){
 	var form = document.searchForm;
 
@@ -49,5 +50,7 @@ function handleGetProjectClick(e){
     } else {
       processCreateResponse("N/A");
     }
+
+}
 }
 
