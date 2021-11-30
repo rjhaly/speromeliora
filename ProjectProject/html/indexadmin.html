@@ -18,7 +18,7 @@ function initialize() {
 <style>
 h1 {text-align: center;}
 h2 {text-align: center;}
-p{ text-align: center;}
+p {text-align: center;}
 </style>
 
 </head>
@@ -26,7 +26,7 @@ p{ text-align: center;}
 
 
 
-<h1> Project Manager: <i>Project View</i></h1>
+<h1> ADMIN Project Manager: <i>Project View</i></h1>
 
 <h2>Create New Project</h2>
 
@@ -37,10 +37,6 @@ p{ text-align: center;}
 <!--   <br>   <input type="checkbox" name="system">Create System Project<br> -->
 </form> 
 
-<h2>All Project</h2>
+<h2>All Projects</h2>
 
-<form name="serachForm" method="post">
-<p>Project name: <input name="Insert Name" value=""/>  
-   <input type="button" id="SearchButton" value="Search Project" onClick="JavaScript:processListResponse(this)">
-</p>
-</form>
+<div id="projectList"></div>
