@@ -5,6 +5,7 @@
 <!-- relative path-name to access js -->
 <script type='text/javascript' src='../js/api.js'></script>
 <script type='text/javascript' src='../js/get_projectList.js'></script>
+<script type='text/javascript' src='../js/get_project.js'></script>
 <script type='text/javascript' src='../js/create.js'></script>
 <script type='text/javascript' src='../js/delete.js'></script>
 
@@ -40,10 +41,10 @@ p{ text-align: center;}
 <!--   <br>   <input type="checkbox" name="system">Create System Project<br> -->
 </form> 
 
-<h2>All Project</h2>
+<h2>Get Project</h2>
 
-<form name="serachForm" method="post">
-<p>Project name: <input name="Insert Name" value=""/>  
-   <input type="button" id="SearchButton" value="Search Project" onClick="JavaScript:processListResponse(this)">
+<form name="searchForm" method="get">
+<p>Project name: <input name="insertName"/>  
+   <input type="button" id="SearchButton" value="Search Project" onClick="JavaScript:handleGetProjectClick(this)">
 </p>
 </form>

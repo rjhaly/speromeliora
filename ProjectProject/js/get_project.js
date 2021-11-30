@@ -1,33 +1,12 @@
-/**
- * Refresh project list from server
- *
- *    GET list_url
- *    RESPONSE  list of [name, value, system] constants 
- */
-function refreshProjectsList() {
-   var xhr = new XMLHttpRequest();
-   xhr.open("GET", list_url, true);
-   xhr.send();
-   
-   console.log("sent");
-
-  // This will process results and update HTML as appropriate. 
-  xhr.onloadend = function () {
-    if (xhr.readyState == XMLHttpRequest.DONE) {
-      console.log ("XHR:" + xhr.responseText);
-      processListResponse(xhr.responseText);
-    } else {
-      processListResponse("N/A");
-    }
-  };
-}
 
 /**
  * Respond to server JSON object.
  *
- * Replace the contents of 'constantList' with a <br>-separated list of name,value pairs.
+ * returns a project
  */
 function processGetResponse(result) {
+	
+
   console.log("res:" + result);
   // Can grab any DIV or SPAN HTML element and can then manipulate its contents dynamically via javascript
   var js = JSON.parse(result);
@@ -44,5 +23,31 @@ function processGetResponse(result) {
 
   // Update computation result
   projList.innerHTML = output;
+}
+function handleGetProjectClick(e){
+	var form = document.searchForm;
+
+  var js = JSON.stringify(form.insertName.value);
+  console.log("JS:" + js);
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", getProject_url, true);
+  xhr.send(js);
+
+  xhr.onloadend = function () {
+    console.log(xhr);
+    console.log(xhr.request);
+    if (xhr.readyState == XMLHttpRequest.DONE) {
+    	 if (xhr.status == 200) {
+	      console.log ("XHR:" + xhr.responseText);
+	      processCreateResponse(xhr.responseText);
+    	 } else {
+    		 console.log("actual:" + xhr.responseText)
+			  var js = JSON.parse(xhr.responseText);
+			  var err = js["response"];
+			  alert (err);
+    	 }
+    } else {
+      processCreateResponse("N/A");
+    }
 }
 
