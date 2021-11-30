@@ -1,7 +1,7 @@
-function processCreateResponse(result) {
+function processCreateResponse(arg1) {
   // Can grab any DIV or SPAN HTML element and can then manipulate its
   // contents dynamically via javascript
-  console.log("result:" + result);
+  console.log("project name:" + arg1);
 
   refreshProjectsList();
 }
@@ -10,7 +10,7 @@ function handleCreateClick(e) {
   var form = document.createForm;
  
   var data = {};
-  data["name"] = form.projectName;
+  data["arg1"] = form.projectName.value;
 
   var js = JSON.stringify(data);
   console.log("JS:" + js);
