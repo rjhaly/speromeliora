@@ -38,7 +38,7 @@ public class ProjectDAO {
             while (resultSet.next()) {
                 resultSet.close();
                 logger.log("Project name already in use");
-                return false;
+                throw new Exception("Failed to create project: project name already exists");
             }
 
             ps = conn.prepareStatement("INSERT INTO projects (pid,isArchived) values(?,?);");
@@ -94,9 +94,11 @@ public class ProjectDAO {
             PreparedStatement ps = conn.prepareStatement("SELECT * FROM projects WHERE pid = ?;");
             ps.setString(1, pid);
             ResultSet resultSet = ps.executeQuery();
-            resultSet.next();
+            if(!resultSet.next()) {
+            	throw new Exception("Failed to archive project: " + "project ID does not exist");
+            }
             logger.log("project found");
-            ps =conn.prepareStatement("UPDATE * SET isArchived WHERE pid = ?");
+            ps =conn.prepareStatement("UPDATE projects SET isArchived = true WHERE pid = ?");
             ps.setNString(1, pid);
             ps.execute();
         } catch (Exception e) {
