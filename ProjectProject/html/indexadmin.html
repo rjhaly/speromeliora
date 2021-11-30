@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script type='text/javascript' src='../js/api.js'></script>
+<script type='text/javascript' src='../js/get_constantList.js'></script>
+<script type='text/javascript' src='../js/create.js'></script>
+<script type='text/javascript' src='../js/delete.js'></script>
+<meta charset="UTF-8">
+<title>PROJECT MANAGER Project View</title>
+
+<script type="text/javascript">
+function initialize() {
+  
+   // get all projects
+   refreshProjectsList();
+}
+</script>
+<style>
+h1 {text-align: center;}
+h2 {text-align: center;}
+p {text-align: center;}
+</style>
+
+</head>
+<body onload="initialize()">
+
+
+
+<h1> ADMIN Project Manager: <i>Project View</i></h1>
+
+<h2>Create New Project</h2>
+
+<form name="createForm" method="post">
+<p>Project name: <input name="Insert Name" value=""/>  
+   <input type="button" id="createButton" value="Create Project" onClick="JavaScript:handleCreateClick(this)">
+</p>
+<!--   <br>   <input type="checkbox" name="system">Create System Project<br> -->
+</form> 
+
+<h2>All Projects</h2>
+
+<div id="projectList"></div>
