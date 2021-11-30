@@ -31,24 +31,18 @@ function processListResponse(result) {
   console.log("res:" + result);
   // Can grab any DIV or SPAN HTML element and can then manipulate its contents dynamically via javascript
   var js = JSON.parse(result);
-  var constList = document.getElementById('constantList');
+  var projList = document.getElementById('projectList');
   
   var output = "";
   for (var i = 0; i < js.list.length; i++) {
-    var constantJson = js.list[i];
-    console.log(constantJson);
+    var projectJson = js.list[i];
+    console.log(projectJson);
     
-    var cname = constantJson["name"];
-    var cval = constantJson["value"];
-    var sysvar = constantJson["system"];
-    if (sysvar) {
-    	output = output + "<div id=\"const" + cname + "\"><b>" + cname + ":</b> = " + cval + "<br></div>";
-    } else {
-    	output = output + "<div id=\"const" + cname + "\"><b>" + cname + ":</b> = " + cval + "(<a href='javaScript:requestDelete(\"" + cname + "\")'><img src='deleteIcon.png'></img></a>) <br></div>";
-    }
+    var pname = projectJson["name"];
+    output = output + "<div id=\"proj" + pname + "\"><b>" + pname + ":</b> = " + "(<a href='javaScript:requestDelete(\"" + pname + "\")'><img src='deleteIcon.png'></img></a>) <br></div>";
   }
 
   // Update computation result
-  constList.innerHTML = output;
+  projList.innerHTML = output;
 }
 
