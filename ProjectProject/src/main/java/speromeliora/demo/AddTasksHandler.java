@@ -31,23 +31,25 @@ public class AddTasksHandler implements RequestHandler<AddTaskRequest, AddTaskRe
         // Get the object from the event and show its content type
 		boolean fail = false;
 		String failMessage = "";
-		ArrayList<String> tasks = new ArrayList<String>();
+		String taskString = "";
 		ArrayList<Task> newTasks = new ArrayList<Task>();
 		String parentTask = "";
 		try {
-			tasks = input.getArg1();
+			taskString = input.getArg1();
 			parentTask =input.getArg2();
 		} catch (NumberFormatException e) {
 			failMessage = "Unable to parse tasks";
 			fail = true;
 		}
-		if (tasks != null) {
+		if (taskString != "") {
 			try {
+				String[] tasks = taskString.split(",");
 				newTasks = addTasksInRDS(tasks, parentTask);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 				fail = true;
+				failMessage = "task name is empty";
 			}
 		}
 
@@ -63,7 +65,7 @@ public class AddTasksHandler implements RequestHandler<AddTaskRequest, AddTaskRe
 		return response; 
 	}
     
-    public ArrayList<Task> addTasksInRDS(ArrayList<String> tasks, String parentTask) throws Exception {
+    public ArrayList<Task> addTasksInRDS(String[] tasks, String parentTask) throws Exception {
 		if (logger != null) { logger.log("in createProject"); }
 		ProjectDAO dao = new ProjectDAO(logger);
 		if (logger != null) { logger.log("retrieved DAO"); }
