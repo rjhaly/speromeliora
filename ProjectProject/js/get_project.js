@@ -17,12 +17,12 @@ function processGetResponse(result) {
     var projectJson = js.list[i];
     console.log(projectJson);
     
-    var pname = projectJson["name"];
+    var pname = projectJson["projectID"];
     output = output + "<div id=\"proj" + pname + "\"><b>" + pname + ":</b> = " + "(<a href='javaScript:requestDelete(\"" + pname + "\")'><img src='deleteIcon.png'></img></a>) <br></div>";
   }
 
   // Update computation result
-  projList.innerHTML = output;
+  proj.innerHTML = output;
 }
 
 function handleGetProjectClick(e){
