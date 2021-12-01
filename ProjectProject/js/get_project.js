@@ -13,13 +13,17 @@ function processGetResponse(result) {
   var proj = document.getElementById('getProjectDisplay');
   
   var output = "";
-  for (var i = 0; i < js.list.length; i++) {
-    var projectJson = js.list[i];
-    console.log(projectJson);
-    
-    var pname = projectJson["projectID"];
-    output = output + "<div id=\"proj" + pname + "\"><b>" + pname + ":</b> = " + "(<a href='javaScript:requestDelete(\"" + pname + "\")'><img src='deleteIcon.png'></img></a>) <br></div>";
-  }
+
+  if(js["statusCode"] === 200){
+	output = "Project Name: " + js["project"]["pid"] + "<br>" +
+			 "tasks: " + js["project"]["tasks"] +  "<br>" +
+			 "teammates: " + js["project"]["teammates"] +  "<br>" +
+			 "isArchived: "  + js["project"]["isArchived"];
+}
+  else{
+	output = "Could not retrieve project";
+	proj.innerHTML = output;
+}
 
   // Update computation result
   proj.innerHTML = output;
@@ -28,11 +32,11 @@ function processGetResponse(result) {
 function handleGetProjectClick(e){
 	var form = document.searchForm;
 
-  var js = JSON.stringify(form.insertName.value);
-  console.log("JS:" + js);
+  var newURL = getProject_url + "/" + form.insertName.value;
+  console.log("JS:" + form.insertName.value);
   var xhr = new XMLHttpRequest();
-  xhr.open("GET", getProject_url, true);
-  xhr.send(js);
+  xhr.open("GET", newURL, true);
+  xhr.send();
 
   xhr.onloadend = function () {
     console.log(xhr);
@@ -40,7 +44,7 @@ function handleGetProjectClick(e){
     if (xhr.readyState == XMLHttpRequest.DONE) {
     	 if (xhr.status == 200) {
 	      console.log ("XHR:" + xhr.responseText);
-	      processCreateResponse(xhr.responseText);
+	      processGetResponse(xhr.responseText);
     	 } else {
     		 console.log("actual:" + xhr.responseText)
 			  var js = JSON.parse(xhr.responseText);
@@ -48,7 +52,7 @@ function handleGetProjectClick(e){
 			  alert (err);
     	 }
     } else {
-      processCreateResponse("N/A");
+      processGetResponse("N/A");
     }
 
 }
