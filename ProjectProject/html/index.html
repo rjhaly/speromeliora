@@ -20,7 +20,7 @@ function initialize() {
 <style>
 h1 {text-align: center;}
 h2 {text-align: center;}
-p{ text-align: center;}
+p  {text-align: center;}
 
 .positiona {
   margin: 0;
@@ -41,6 +41,10 @@ p{ text-align: center;}
   transform: translate(-50%, -50%);
 }
 
+.center {
+  border: 2px solid black;
+  text-align: center;
+}
 
 </style>
 
@@ -59,9 +63,6 @@ p{ text-align: center;}
 </p>
 <!--   <br>   <input type="checkbox" name="system">Create System Project<br> -->
 </form>
-<div class="positiona">
-<div id = "createProjectDisplay"></div>
-</div>
 
 <h2>Get Project</h2>
 
@@ -77,6 +78,7 @@ p{ text-align: center;}
 </p>
 </form>
 
-<div class ="postionb">
-<div id = "getProjectDisplay"></div>
-</div>
+<div id="consoleMessageDisplay" class="center"><p>Console Message Display</p></div>
+<div id="getProjectDisplay" class="center"><p>Get Project Display</p></div>
+
+</body>

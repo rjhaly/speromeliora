@@ -5,27 +5,28 @@
  * returns a project
  */
 function processGetResponse(result) {
-	
-
   console.log("res:" + result);
   // Can grab any DIV or SPAN HTML element and can then manipulate its contents dynamically via javascript
   var js = JSON.parse(result);
-  var proj = document.getElementById('getProjectDisplay');
+  var proj = document.getElementById("getProjectDisplay");
+  var cons = document.getElementById("consoleMessageDisplay");
   
   var output = "";
 
-  if(js["statusCode"] === 200){
-	output = "Project Name: " + js["project"]["pid"] 		+ "<br>" +
+  if(js["statusCode"] == 200){
+	output = "<p>" +
+			 "Project Name: " + js["project"]["pid"] 		+ "<br>" +
 			 "tasks: " 		  + js["project"]["tasks"] 		+ "<br>" +
 			 "teammates: " 	  + js["project"]["teammates"] 	+ "<br>" +
-			 "isArchived: "   + js["project"]["isArchived"];
-  } else {
-	output = "Could not retrieve project";
+			 "isArchived: "   + js["project"]["isArchived"] + "</p>";
+	// Update computation result
 	proj.innerHTML = output;
+	cons.innerHTML = "<p>Console Message Display</p>";
+  } else if (js["statusCode"] == 400) {
+	output = "<p>Could not retrieve project</p>";
+	proj.innerHTML = "<p></p>";
+	cons.innerHTML = output;
   }
-
-  // Update computation result
-  proj.innerHTML = output;
 }
 
 function handleGetProjectClick(e){

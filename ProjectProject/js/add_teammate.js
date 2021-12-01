@@ -4,28 +4,34 @@ function processAddTeammateResponse(result) {
   console.log("res:" + result);
   // Can grab any DIV or SPAN HTML element and can then manipulate its contents dynamically via javascript
   var js = JSON.parse(result);
-  var proj = document.getElementById('getProjectDisplay');
+  console.log(js);
+  var proj = document.getElementById("getProjectDisplay");
+  var cons = document.getElementById("consoleMessageDisplay");
   
   var output = "";
 
-  if(js["statusCode"] === 200) {
-	output = "Project Name: " + js["project"]["pid"] 		+ "<br>" +
+  if(js["statusCode"] == 200) {
+	output = "<p>" +
+			 "Project Name: " + js["project"]["pid"] 		+ "<br>" +
 			 "tasks: " 		  + js["project"]["tasks"] 		+ "<br>" +
 			 "teammates: " 	  + js["project"]["teammates"] 	+ "<br>" +
-			 "isArchived: "   + js["project"]["isArchived"];
-  } else {
-	output = "Could not retrieve project";
+			 "isArchived: "   + js["project"]["isArchived"] + "</p>";
+	// Update computation result
 	proj.innerHTML = output;
+	cons.innerHTML = "<p>Console Message Display</p>";
+  } else if (js["statusCode"] == 400) {
+	output = js["error"];
+	cons.innerHTML = output;
   }
-
-  // Update computation result
-  proj.innerHTML = output;
+  
 }
 function handleAddTeammateClick(e) {
-  var form = document.addTeammateForm;
+  var projectForm = document.searchForm;
+  var teammateForm = document.addTeammateForm;
  
   var data = {};
-  data["arg1"] = form.addTeammateName.value;
+  data["arg1"] = projectForm.searchProjectName.value;
+  data["arg2"] = teammateForm.addTeammateName.value;
 
   var js = JSON.stringify(data);
   console.log("JS:" + js);
