@@ -226,10 +226,16 @@ public class ProjectDAO {
                     logger.log("Teammate already assigned to this project");
                     throw new Exception("Failed to add teammate: teamate already added");
                 }
-            	
-            	ps = conn.prepareStatement("INSERT INTO teammtes (tmt_id) values(?);");
-                ps.setString(1,  teammateName);
-                ps.execute();
+            	ps = conn.prepareStatement("SELECT * FROM teammates WHERE tmt_id = ?;");
+            	ps.setNString(1, teammateName);
+            	resultSet = ps.executeQuery();
+            	if(!resultSet.next()) {
+            	logger.log("creating teammate in db");
+            		ps = conn.prepareStatement("INSERT INTO teammates (tmt_id) values (?);");
+            		ps.setNString(1,  teammateName);
+            		ps.execute();
+            	}
+                logger.log("created teammate, adding into lookup table");
                 ps = conn.prepareStatement("INSERT INTO lookup_table (pid,tmt_id) values(?,?);");
                 ps.setNString(1, pid);
                 ps.setString(2, teammateName);
@@ -238,7 +244,7 @@ public class ProjectDAO {
             }
             
         } catch (Exception e) {
-            throw new Exception("Unable to retrieve Project: " + e.getMessage());
+            throw new Exception("Unable to add Teammate: " + e.getMessage());
         }
     }
     }
