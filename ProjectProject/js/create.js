@@ -7,10 +7,10 @@ function processCreateResponse(result) {
   var proj = document.getElementById("createProjectDisplay");
 
   var output = "";
-  var status = js.list["statusCode"];
-  console.log(projectJson);
+  var status = js["statusCode"];
+  console.log(status);
 
-  proj.innerHTML = projectJson;
+  proj.innerHTML = status;
 }
 function handleCreateClick(e) {
   var form = document.createForm;
