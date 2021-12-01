@@ -203,7 +203,7 @@ public class ProjectDAO {
         }
     }
     
-    public boolean addTeammate(String pid, String teammateName) throws Exception {
+    public Project addTeammate(String pid, String teammateName) throws Exception {
         try {
             PreparedStatement ps = conn.prepareStatement("SELECT * FROM projects WHERE pid = ?;");
             ps.setString(1, pid);
@@ -240,11 +240,22 @@ public class ProjectDAO {
                 ps.setNString(1, pid);
                 ps.setString(2, teammateName);
                 ps.execute();
-                return true;
+                
+                return getProject(pid);
             }
             
         } catch (Exception e) {
             throw new Exception("Unable to add Teammate: " + e.getMessage());
+        }
+    }
+    public void removeTeammate(String pid, String teammateName) throws Exception {
+        try {
+            PreparedStatement ps = conn.prepareStatement("DELETE FROM lookup_table WHERE pid = ? && tmt_id = ?;");
+            ps.setString(1, pid);
+            ps.setNString(2, teammateName);
+            ps.execute();
+        } catch (Exception e) {
+            throw new Exception("Failed to remove teammate: " + e.getMessage());
         }
     }
     }
