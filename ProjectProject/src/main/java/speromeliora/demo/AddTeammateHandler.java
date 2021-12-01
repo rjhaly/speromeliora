@@ -38,6 +38,7 @@ public class AddTeammateHandler implements RequestHandler<AddTeammateRequest, Ad
 		String failMessage = "";
 		String pid = "";
 		String teammateName = "";
+		Project project = new Project();
 		try {
 			pid = req.getArg1();
 		} catch (NumberFormatException e) {
@@ -52,7 +53,7 @@ public class AddTeammateHandler implements RequestHandler<AddTeammateRequest, Ad
 		}
 		if (pid != "" && teammateName != "") {
 			try {
-				addTeammateInRDS(pid, teammateName);
+				project = addTeammateInRDS(pid, teammateName);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -66,18 +67,19 @@ public class AddTeammateHandler implements RequestHandler<AddTeammateRequest, Ad
 		if (fail) {
 			response = new AddTeammateResponse(400, failMessage);
 		} else {
-			response = new AddTeammateResponse(teammateName, 200);  // success
+			response = new AddTeammateResponse(project, 200);  // success
 		}
 
 		return response; 
 	}
     
-    public void addTeammateInRDS(String pid, String teammateName) throws Exception {
+    public Project addTeammateInRDS(String pid, String teammateName) throws Exception {
 		if (logger != null) { logger.log("in addTeammate"); }
 		ProjectDAO dao = new ProjectDAO(logger);
 		if (logger != null) { logger.log("retrieved DAO"); }
-		dao.addTeammate(pid, teammateName);
+		Project project = dao.addTeammate(pid, teammateName);
 		if (logger != null) { logger.log("teammate added"); }
+		return project;
 	}
     
 

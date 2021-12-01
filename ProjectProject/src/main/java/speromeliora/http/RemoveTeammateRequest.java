@@ -1,6 +1,6 @@
 package speromeliora.http;
 
-public class AddTeammateRequest {
+public class RemoveTeammateRequest {
 	String arg1;
 	String arg2;
 
@@ -10,14 +10,14 @@ public class AddTeammateRequest {
 	public void setArg2(String arg2) { this.arg2 = arg2; }
 
 	public String toString() {
-		return "Add Teammate(" + arg2 + ")";
+		return "Remove Teammate(" + arg2 + ")";
 	}
 	
-	public AddTeammateRequest (String arg1, String arg2) {
+	public RemoveTeammateRequest (String arg1, String arg2) {
 		this.arg1 = arg1;
 		this.arg2 = arg2;
 	}
 	
-	public AddTeammateRequest() {
+	public RemoveTeammateRequest() {
 	}
 }

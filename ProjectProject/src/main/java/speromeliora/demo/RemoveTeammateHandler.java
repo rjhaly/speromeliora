@@ -10,6 +10,8 @@ import speromeliora.http.ArchiveProjectRequest;
 import speromeliora.http.ArchiveProjectResponse;
 import speromeliora.http.DeleteProjectRequest;
 import speromeliora.http.DeleteProjectResponse;
+import speromeliora.http.RemoveTeammateRequest;
+import speromeliora.http.RemoveTeammateResponse;
 
 public class RemoveTeammateHandler implements RequestHandler<RemoveTeammateRequest, RemoveTeammateResponse> {
 	private AmazonS3 s3 = null;
@@ -17,12 +19,12 @@ public class RemoveTeammateHandler implements RequestHandler<RemoveTeammateReque
     public RemoveTeammateHandler() {}
 
     // Test purpose only.
-    RemoveTeammatetHandler(AmazonS3 s3) {
+    RemoveTeammateHandler(AmazonS3 s3) {
         this.s3 = s3;
     }
 
     @Override
-    public DeleteProjectResponse handleRequest(RemoveTeammateRequest req, Context context) {
+    public RemoveTeammateResponse handleRequest(RemoveTeammateRequest req, Context context) {
         logger = context.getLogger();
         logger.log("Loading Java Lambda handler of RequestHandler");
 		logger.log(req.toString());
@@ -56,11 +58,11 @@ public class RemoveTeammateHandler implements RequestHandler<RemoveTeammateReque
 
 		// compute proper response and return. Note that the status code is internal to the HTTP response
 		// and has to be processed specifically by the client code.
-		DeleteProjectResponse response;
+		RemoveTeammateResponse response;
 		if (fail) {
-			response = new DeleteProjectResponse(400, failMessage);
+			response = new RemoveTeammateResponse(400, failMessage);
 		} else {
-			response = new DeleteProjectResponse(200);  // success
+			response = new RemoveTeammateResponse(pid, 200);  // success
 		}
 
 		return response; 
@@ -70,7 +72,7 @@ public class RemoveTeammateHandler implements RequestHandler<RemoveTeammateReque
 		if (logger != null) { logger.log("in createProject"); }
 		ProjectDAO dao = new ProjectDAO(logger);
 		if (logger != null) { logger.log("retrieved DAO"); }
-		dao.removeTeammate(pid);
+		dao.removeTeammate(pid, teammateName);
 		if (logger != null) { logger.log("removed Teammate"); }
 	}
 }
