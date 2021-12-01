@@ -34,17 +34,19 @@ public class AddTasksHandler implements RequestHandler<AddTaskRequest, AddTaskRe
 		String taskString = "";
 		ArrayList<Task> newTasks = new ArrayList<Task>();
 		String parentTask = "";
+		String project = "";
 		try {
 			taskString = input.getArg1();
 			parentTask =input.getArg2();
+			project = input.getArg3();
 		} catch (NumberFormatException e) {
-			failMessage = "Unable to parse tasks";
+			failMessage = "Unable to parse add task info";
 			fail = true;
 		}
-		if (taskString != "") {
+		if (taskString != "" && project != "") {
 			try {
 				String[] tasks = taskString.split(",");
-				newTasks = addTasksInRDS(tasks, parentTask);
+				newTasks = addTasksInRDS(tasks, parentTask, project);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -65,11 +67,11 @@ public class AddTasksHandler implements RequestHandler<AddTaskRequest, AddTaskRe
 		return response; 
 	}
     
-    public ArrayList<Task> addTasksInRDS(String[] tasks, String parentTask) throws Exception {
+    public ArrayList<Task> addTasksInRDS(String[] tasks, String parentTask, String project) throws Exception {
 		if (logger != null) { logger.log("in createProject"); }
 		ProjectDAO dao = new ProjectDAO(logger);
 		if (logger != null) { logger.log("retrieved DAO"); }
-		ArrayList<Task> newTasks = dao.addTasks(tasks, parentTask);
+		ArrayList<Task> newTasks = dao.addTasks(tasks, parentTask, project);
 		if (logger != null) { logger.log("created Project"); }
 		return newTasks;
 	}
