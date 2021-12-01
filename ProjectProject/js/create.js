@@ -8,6 +8,12 @@ function processCreateResponse(result) {
 
   var output = "";
   var status = js["statusCode"];
+  if (status === 200) {
+	status = "Project successfully created.";
+  } else if (status === 400) {
+	status = "Project failed to create.";
+  }
+
   console.log(status);
 
   proj.innerHTML = status;
