@@ -202,4 +202,43 @@ public class ProjectDAO {
             throw new Exception("Failed to add task: " + e.getMessage());
         }
     }
-}
+    
+    public boolean addTeammate(String pid, String teammateName) throws Exception {
+        try {
+            PreparedStatement ps = conn.prepareStatement("SELECT * FROM projects WHERE pid = ?;");
+            ps.setString(1, pid);
+            ResultSet resultSet = ps.executeQuery();
+            
+            // already present?
+            if(!resultSet.next()) {
+                resultSet.close();
+                logger.log("No project with name " + pid);
+                throw new Exception("Unable to retrieve Project: No project with given name");
+            }
+            else {
+            	ps = conn.prepareStatement("SELECT * FROM lookup_table WHERE pid = ? AND tmt_id = ?;");
+            	ps.setNString(1, pid);
+            	ps.setNString(2, teammateName);
+            	resultSet = ps.executeQuery();
+            	
+            	while (resultSet.next()) {
+                    resultSet.close();
+                    logger.log("Teammate already assigned to this project");
+                    throw new Exception("Failed to add teammate: teamate already added");
+                }
+            	
+            	ps = conn.prepareStatement("INSERT INTO teammtes (tmt_id) values(?);");
+                ps.setString(1,  teammateName);
+                ps.execute();
+                ps = conn.prepareStatement("INSERT INTO lookup_table (pid,tmt_id) values(?,?);");
+                ps.setNString(1, pid);
+                ps.setString(2, teammateName);
+                ps.execute();
+                return true;
+            }
+            
+        } catch (Exception e) {
+            throw new Exception("Unable to retrieve Project: " + e.getMessage());
+        }
+    }
+    }
