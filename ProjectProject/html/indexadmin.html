@@ -19,6 +19,24 @@ function initialize() {
 h1 {text-align: center;}
 h2 {text-align: center;}
 p {text-align: center;}
+
+.positionb {
+  margin: 0;
+  position: absolute;
+  top: 15%;
+  left: 80%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+.positionc {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
 </style>
 
 </head>
@@ -28,15 +46,24 @@ p {text-align: center;}
 
 <h1> ADMIN Project Manager: <i>Project View</i></h1>
 
-<h2>Create New Project</h2>
-
-<form name="createForm" method="post">
-<p>Project name: <input name="Insert Name" value=""/>  
-   <input type="button" id="createButton" value="Create Project" onClick="JavaScript:handleCreateClick(this)">
-</p>
-<!--   <br>   <input type="checkbox" name="system">Create System Project<br> -->
-</form> 
 
 <h2>All Projects</h2>
 
 <div id="projectList"></div>
+
+
+
+<div class="positionb">
+    <input type ="button" id="Deleteproject" value ="Delete project" onClick =null>
+    <input type ="button" id="Archieveproject" value ="Archive Project" onClick =null>
+  </div>
+  
+ <div class="positionc">
+	<input type = "button" id = "ShowProjects" value = "Show projects" onClick ="JavaScript:processListResponse(this)">
+</div>
+
+
+
+
+
+
