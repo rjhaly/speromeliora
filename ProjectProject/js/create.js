@@ -22,7 +22,7 @@ function handleCreateClick(e) {
   var form = document.createForm;
  
   var data = {};
-  data["arg1"] = form.projectName.value;
+  data["arg1"] = form.createProjectName.value;
 
   var js = JSON.stringify(data);
   console.log("JS:" + js);

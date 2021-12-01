@@ -5,5 +5,6 @@ var base_url = "https://umrdxh6f76.execute-api.us-east-2.amazonaws.com/Alphiwalp
 var listProject_url   = base_url + "projectList";    // GET
 var createProject_url = base_url + "projectCreation";    // POST
 var getProject_url    = base_url + "project";
+var addTeammate_url   = base_url + "teammateAddition";
 
 // var delete_url = base_url + "projects";    // POST with {name}   [challenge in getting DELETE to work]
