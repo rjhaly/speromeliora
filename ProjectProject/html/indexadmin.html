@@ -2,17 +2,13 @@
 <html>
 <head>
 <script type='text/javascript' src='../js/api.js'></script>
-<script type='text/javascript' src='../js/get_constantList.js'></script>
-<script type='text/javascript' src='../js/create.js'></script>
-<script type='text/javascript' src='../js/delete.js'></script>
+<script type='text/javascript' src='../js/get_projectList.js'></script>
 <meta charset="UTF-8">
 <title>PROJECT MANAGER Project View</title>
 
 <script type="text/javascript">
 function initialize() {
   
-   // get all projects
-   refreshProjectsList();
 }
 </script>
 <style>
@@ -59,9 +55,10 @@ p {text-align: center;}
   </div>
   
  <div class="positionc">
-	<input type = "button" id = "ShowProjects" value = "Show projects" onClick ="JavaScript:processListResponse(this)">
+	<input type = "button" id = "ShowProjects" value = "Show projects" onClick ="JavaScript:handleListProjectClick(this)">
 </div>
 
+<div id = "projectListDisplay"></div>
 
 
 

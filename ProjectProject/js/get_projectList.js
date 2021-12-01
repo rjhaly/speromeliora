@@ -4,45 +4,55 @@
  *    GET list_url
  *    RESPONSE  list of [name, value, system] constants 
  */
-function refreshProjectsList() {
-   var xhr = new XMLHttpRequest();
-   xhr.open("GET", listProject_url, true);
-   xhr.send();
-   
-   console.log("sent");
+function processGetListResponse(result) {
+	
 
-  // This will process results and update HTML as appropriate. 
-  xhr.onloadend = function () {
-    if (xhr.readyState == XMLHttpRequest.DONE) {
-      console.log ("XHR:" + xhr.responseText);
-      processListResponse(xhr.responseText);
-    } else {
-      processListResponse("N/A");
-    }
-  };
-}
-
-/**
- * Respond to server JSON object.
- *
- * Replace the contents of 'constantList' with a <br>-separated list of name,value pairs.
- */
-function processListResponse(result) {
   console.log("res:" + result);
   // Can grab any DIV or SPAN HTML element and can then manipulate its contents dynamically via javascript
   var js = JSON.parse(result);
-  var projList = document.getElementById('projectList');
+  var proj = document.getElementById('projectListDisplay');
   
   var output = "";
-  for (var i = 0; i < js.list.length; i++) {
-    var projectJson = js.list[i];
-    console.log(projectJson);
-    
-    var pname = projectJson["name"];
-    output = output + "<div id=\"proj" + pname + "\"><b>" + pname + ":</b> = " + "(<a href='javaScript:requestDelete(\"" + pname + "\")'><img src='deleteIcon.png'></img></a>) <br></div>";
-  }
+
+  if(js["statusCode"] === 200){
+	for(var i = 0; i < js["projects"].length; i++){
+		output = output + "Project Name: " + js["projects"][i]["pid"] + "<br>" +
+						  "tasks: " + js["projects"][i]["tasks"] +  "<br>" +
+						  "teammates: " + js["projects"][i]["teammates"] +  "<br>" +
+						  "isArchived: "  + js["projects"][i]["isArchived"] +  "<br><br>";
+	}
+}
+  else{
+	output = "Could not retrieve projects";
+}
 
   // Update computation result
-  projList.innerHTML = output;
+  proj.innerHTML = output;
+}
+
+function handleListProjectClick(e){
+	
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", listProject_url, true);
+  xhr.send();
+
+  xhr.onloadend = function () {
+    console.log(xhr);
+    console.log(xhr.request);
+    if (xhr.readyState == XMLHttpRequest.DONE) {
+    	 if (xhr.status == 200) {
+	      console.log ("XHR:" + xhr.responseText);
+	      processGetListResponse(xhr.responseText);
+    	 } else {
+    		 console.log("actual:" + xhr.responseText)
+			  var js = JSON.parse(xhr.responseText);
+			  var err = js["response"];
+			  alert (err);
+    	 }
+    } else {
+      processGetListResponse("N/A");
+    }
+
+}
 }
 
