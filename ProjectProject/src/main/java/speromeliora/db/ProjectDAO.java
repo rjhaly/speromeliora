@@ -73,7 +73,13 @@ public class ProjectDAO {
             	
             	while(resultSet.next()) {
             		String attribute;
-            		if((attribute = resultSet.getString("tsk_id")) != null) {
+            		if(resultSet.getString("tsk_id") != null) {
+            			logger.log("Looking at task id " + resultSet.getInt("tsk_id"));
+            			PreparedStatement ps1 = conn.prepareStatement("SELECT * FROM tasks WHERE tsk_id = ?;");
+            			ps1.setInt(1, resultSet.getInt("tsk_id"));
+            			ResultSet resultSet1 = ps1.executeQuery();
+            			logger.log("" + resultSet1.next());
+            			attribute = resultSet1.getNString("tsk_name");
             			tasks.add(attribute);
             		}
             		else {
@@ -204,7 +210,7 @@ public class ProjectDAO {
 	            newTasks.add(task);
 	            ps = conn.prepareStatement("INSERT INTO lookup_table (pid, tsk_id) values (?,?);");
 	            ps.setNString(1, pid);
-	            ps.setNString(2, tasks[i]);
+	            ps.setInt(2, taskID);
 	            ps.execute();
 	            logger.log("finished creating new task");
         	}
