@@ -12,7 +12,6 @@ function processCreateResponse(result) {
 
   proj.innerHTML = projectJson;
 }
-
 function handleCreateClick(e) {
   var form = document.createForm;
  
