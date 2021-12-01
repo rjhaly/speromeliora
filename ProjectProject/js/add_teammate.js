@@ -1,12 +1,6 @@
 
-/**
- * Respond to server JSON object.
- *
- * returns a project
- */
-function processGetResponse(result) {
-	
 
+function processAddTeammateResponse(result) {
   console.log("res:" + result);
   // Can grab any DIV or SPAN HTML element and can then manipulate its contents dynamically via javascript
   var js = JSON.parse(result);
@@ -14,7 +8,7 @@ function processGetResponse(result) {
   
   var output = "";
 
-  if(js["statusCode"] === 200){
+  if(js["statusCode"] === 200) {
 	output = "Project Name: " + js["project"]["pid"] 		+ "<br>" +
 			 "tasks: " 		  + js["project"]["tasks"] 		+ "<br>" +
 			 "teammates: " 	  + js["project"]["teammates"] 	+ "<br>" +
@@ -27,23 +21,28 @@ function processGetResponse(result) {
   // Update computation result
   proj.innerHTML = output;
 }
+function handleAddTeammateClick(e) {
+  var form = document.addTeammateForm;
+ 
+  var data = {};
+  data["arg1"] = form.addTeammateName.value;
 
-function handleGetProjectClick(e){
-	var form = document.searchForm;
-
-  var newURL = getProject_url + "/" + form.searchProjectName.value;
-  console.log("JS:" + form.searchProjectName.value);
+  var js = JSON.stringify(data);
+  console.log("JS:" + js);
   var xhr = new XMLHttpRequest();
-  xhr.open("GET", newURL, true);
-  xhr.send();
+  xhr.open("POST", addTeammate_url, true);
 
+  // send the collected data as JSON
+  xhr.send(js);
+
+  // This will process results and update HTML as appropriate. 
   xhr.onloadend = function () {
     console.log(xhr);
     console.log(xhr.request);
     if (xhr.readyState == XMLHttpRequest.DONE) {
     	 if (xhr.status == 200) {
 	      console.log ("XHR:" + xhr.responseText);
-	      processGetResponse(xhr.responseText);
+	      processAddTeammateResponse(xhr.responseText);
     	 } else {
     		 console.log("actual:" + xhr.responseText)
 			  var js = JSON.parse(xhr.responseText);
@@ -51,9 +50,7 @@ function handleGetProjectClick(e){
 			  alert (err);
     	 }
     } else {
-      processGetResponse("N/A");
+      processAddTeammateResponse("N/A");
     }
-
+  };
 }
-}
-

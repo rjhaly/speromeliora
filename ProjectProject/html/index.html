@@ -7,6 +7,7 @@
 <script type='text/javascript' src='../js/get_project.js'></script>
 <script type='text/javascript' src='../js/create.js'></script>
 <script type='text/javascript' src='../js/delete.js'></script>
+<script type='text/javascript' src='../js/add_teammate.js'></script>
 
 <meta charset="UTF-8">
 <title>PROJECT MANAGER Project View</title>
@@ -53,7 +54,7 @@ p{ text-align: center;}
 <h2>Create New Project</h2>
 
 <form name="createForm" method="post">
-<p>Project name: <input name="projectName"/>  
+<p>Project name: <input name="createProjectName"/>  
    <input type="button" id="createButton" value="Create Project" onClick="JavaScript:handleCreateClick(this)">
 </p>
 <!--   <br>   <input type="checkbox" name="system">Create System Project<br> -->
@@ -65,8 +66,14 @@ p{ text-align: center;}
 <h2>Get Project</h2>
 
 <form name="searchForm" method="get">
-<p>Project name: <input name="insertName"/>  
-   <input type="button" id="SearchButton" value="Search Project" onClick="JavaScript:handleGetProjectClick(this)">
+<p>Project name: <input name="searchProjectName" value=""/>  
+   <input type="button" id="searchButton" value="Search Project" onClick="JavaScript:handleGetProjectClick(this)">
+</p>
+</form>
+
+<form name="addTeammateForm" method="post">
+<p>Teammate name: <input name="addTeammateName" value=""/>
+   <input type="button" id="addTeammateButton" value="Add Teammate" onClick="JavaScript:handleAddTeammateClick(this)">
 </p>
 </form>
 
