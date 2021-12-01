@@ -60,6 +60,10 @@ public class AddTeammateHandler implements RequestHandler<AddTeammateRequest, Ad
 				fail = true;
 			}
 		}
+		else {
+			failMessage = "One or more text fields left empty";
+			fail = true;
+		}
 
 		// compute proper response and return. Note that the status code is internal to the HTTP response
 		// and has to be processed specifically by the client code.

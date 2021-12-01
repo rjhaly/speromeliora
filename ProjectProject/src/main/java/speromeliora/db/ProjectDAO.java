@@ -73,7 +73,13 @@ public class ProjectDAO {
             	
             	while(resultSet.next()) {
             		String attribute;
-            		if((attribute = resultSet.getString("tsk_id")) != null) {
+            		if(resultSet.getString("tsk_id") != null) {
+            			logger.log("Looking at task id " + resultSet.getInt("tsk_id"));
+            			PreparedStatement ps1 = conn.prepareStatement("SELECT * FROM tasks WHERE tsk_id = ?;");
+            			ps1.setInt(1, resultSet.getInt("tsk_id"));
+            			ResultSet resultSet1 = ps1.executeQuery();
+            			logger.log("" + resultSet1.next());
+            			attribute = resultSet1.getNString("tsk_name");
             			tasks.add(attribute);
             		}
             		else {
@@ -151,10 +157,17 @@ public class ProjectDAO {
             throw new Exception("Unable to retrieve Project: " + e.getMessage());
         }
     }
-    public ArrayList<Task> addTasks(String[] tasks, String parentTask) throws Exception {
+    public ArrayList<Task> addTasks(String[] tasks, String parentTask, String pid) throws Exception {
         try {
         	ArrayList<Task> newTasks = new ArrayList<Task>();
         	logger.log("starting to create task");
+        	PreparedStatement ps = conn.prepareStatement("SELECT * FROM projects WHERE pid = ?;");
+        	ps.setNString(1, pid);
+        	ResultSet resultSet = ps.executeQuery();
+        	
+        	if(!resultSet.next()) {
+        		throw new Exception("Failed to add task: could not find project");
+        	}	
         	for(int i = 0; i < tasks.length; i++) {
         		logger.log("creating a new task");
         		Task task = new Task();
@@ -164,7 +177,7 @@ public class ProjectDAO {
         		task.setTeammates(new ArrayList<String>());
         		task.setName(tasks[i]);
         		logger.log("made a new task");
-        		PreparedStatement ps = conn.prepareStatement(
+        		ps = conn.prepareStatement(
         				"INSERT INTO tasks (tsk_name, isComplete, isBottomLevel, parent_tsk_id, tsk_identifier) "
         				+ "values(?,false,true,?,?);");
         		ps.setString(1,  tasks[i]);
@@ -173,7 +186,7 @@ public class ProjectDAO {
         			ps.setNString(2, parentTask);
         			PreparedStatement ps1 = conn.prepareStatement("SELECT * FROM projects WHERE tsk_id = ?;");
                     ps1.setString(1, parentTask);
-                    ResultSet resultSet = ps1.executeQuery();
+                    resultSet = ps1.executeQuery();
                     String identifier ="" + resultSet.getString("tsk_identifier") + "." + i;
                     ps.setNString(3, identifier);
                     task.setTaskIdentifier(identifier);
@@ -187,7 +200,7 @@ public class ProjectDAO {
 	            ps.execute();
 	            logger.log("added task to db");
 	            ps = conn.prepareStatement("SELECT * FROM tasks WHERE tsk_id=(SELECT max(tsk_id) FROM tasks);");
-	            ResultSet resultSet = ps.executeQuery();
+	            resultSet = ps.executeQuery();
 	            resultSet.next();
 	            logger.log("executed querey");
 	            int taskID = resultSet.getInt("tsk_id");
@@ -195,6 +208,10 @@ public class ProjectDAO {
 	            task.setTaskID(taskID);
 	            logger.log("set Task id");
 	            newTasks.add(task);
+	            ps = conn.prepareStatement("INSERT INTO lookup_table (pid, tsk_id) values (?,?);");
+	            ps.setNString(1, pid);
+	            ps.setInt(2, taskID);
+	            ps.execute();
 	            logger.log("finished creating new task");
         	}
         	return newTasks;
