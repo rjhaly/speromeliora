@@ -39,14 +39,19 @@ function processDelete(name) {
   xhr.send(null);  //  NEED TO GET IT GOING
 }
 
-function handleProjectdeletClick(e){
+function handleProjectDeleteClick(e){
 	var form = document.searchForm;
 
-  var newURL = getProject_url + "/" + form.searchProjectName.value;
-  console.log("JS:" + form.searchProjectName.value);
+  var data = {};
+  data["arg1"] = form.searchProjectName.value;
+
+  var js = JSON.stringify(data);
+  console.log("JS:" + js);
   var xhr = new XMLHttpRequest();
-  xhr.open("GET", newURL, true);
-  xhr.send();
+  xhr.open("POST", deleteProject_url, true);
+
+  // send the collected data as JSON
+  xhr.send(js);
 
   xhr.onloadend = function () {
     console.log(xhr);
