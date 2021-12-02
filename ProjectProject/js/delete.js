@@ -39,3 +39,32 @@ function processDelete(name) {
   xhr.send(null);  //  NEED TO GET IT GOING
 }
 
+function handleProjectdeletClick(e){
+	var form = document.searchForm;
+
+  var newURL = getProject_url + "/" + form.searchProjectName.value;
+  console.log("JS:" + form.searchProjectName.value);
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", newURL, true);
+  xhr.send();
+
+  xhr.onloadend = function () {
+    console.log(xhr);
+    console.log(xhr.request);
+    if (xhr.readyState == XMLHttpRequest.DONE) {
+    	 if (xhr.status == 200) {
+	      console.log ("XHR:" + xhr.responseText);
+	      requestDelete(xhr.responseText);
+    	 } else {
+    		 console.log("actual:" + xhr.responseText)
+			  var js = JSON.parse(xhr.responseText);
+			  var err = js["response"];
+			  alert (err);
+    	 }
+    } else {
+      requestDelete("N/A");
+    }
+
+}
+}
+

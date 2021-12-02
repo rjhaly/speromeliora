@@ -4,19 +4,19 @@ function processCreateResponse(result) {
   console.log("project name:" + result);
 
   var js = JSON.parse(result);
-  var proj = document.getElementById("createProjectDisplay");
+  var cons = document.getElementById("consoleMessageDisplay");
 
   var output = "";
   var status = js["statusCode"];
   if (status === 200) {
-	status = "Project successfully created.";
+	status = "<p>Project successfully created.</p>";
   } else if (status === 400) {
-	status = "Project failed to create.";
+	status = "<p>Project failed to create.</p>";
   }
 
   console.log(status);
 
-  proj.innerHTML = status;
+  cons.innerHTML = status;
 }
 function handleCreateClick(e) {
   var form = document.createForm;
