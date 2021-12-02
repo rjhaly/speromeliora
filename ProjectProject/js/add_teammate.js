@@ -27,7 +27,7 @@ function processAddTeammateResponse(result) {
 }
 function handleAddTeammateClick(e) {
   var projectForm = document.searchForm;
-  var teammateForm = document.addTeammateForm;
+  var teammateForm = document.teammateForm;
  
   var data = {};
   data["arg1"] = projectForm.searchProjectName.value;
