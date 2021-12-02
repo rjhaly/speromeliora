@@ -11,6 +11,7 @@ function processGetResponse(result) {
   var proj = document.getElementById("getProjectDisplay");
   var cons = document.getElementById("consoleMessageDisplay");
   var projecttname = document.getElementById("ShowProjectname");
+  var form = document.searchForm;
   
   var output = "";
   var output2 = "";
