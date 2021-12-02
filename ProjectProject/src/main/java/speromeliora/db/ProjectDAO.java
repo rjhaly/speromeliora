@@ -275,4 +275,33 @@ public class ProjectDAO {
             throw new Exception("Failed to remove teammate: " + e.getMessage());
         }
     }
+    
+    public Project markTask(int tid) throws Exception {
+        try {
+            PreparedStatement ps = conn.prepareStatement("SELECT * FROM tasks WHERE tsk_id = ?;");
+            ps.setInt(1, tid);
+            ResultSet resultSet = ps.executeQuery();
+            if(!resultSet.next()) {
+            	throw new Exception("Failed to mark task: " + "Unable to find task");
+            }
+            logger.log("task found");
+            ps =conn.prepareStatement("UPDATE tasks SET isComplete = !isComplete WHERE tsk_id = ?");
+            ps.setInt(1, tid);
+            ps.execute();
+            logger.log("task updated");
+            ps = conn.prepareStatement("SELECT * FROM lookup_table WHERE tsk_id = ?;");
+            ps.setInt(1, tid);
+            resultSet = ps.executeQuery();
+            if(!resultSet.next()) {
+            	throw new Exception("Failed to mark task: " + "could not find task");
+            }
+            String pid = resultSet.getString("pid");
+            return getProject(pid);
+            
+            
+        } catch (Exception e) {
+        	logger.log("exception thrown");
+            throw new Exception("Failed to mark task: " + "could not find task");
+        }
+    }
     }
