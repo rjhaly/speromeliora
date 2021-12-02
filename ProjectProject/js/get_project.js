@@ -10,7 +10,7 @@ function processGetResponse(result) {
   var js = JSON.parse(result);
   var proj = document.getElementById("getProjectDisplay");
   var cons = document.getElementById("consoleMessageDisplay");
-  var projecttname = document.getElementByID("ShowProjectname");
+  var projecttname = document.getElementById("ShowProjectname");
   
   var output = "";
   var output2 = "";
