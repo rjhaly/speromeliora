@@ -7,7 +7,7 @@ function processDeleteResponse(result) {
 }
 
 function requestDelete(val) {
-   if (confirm("Request to delete " + val)) {
+   if (confirm("Request to delete " + name)) {
      processDelete(val);
    }
 }
