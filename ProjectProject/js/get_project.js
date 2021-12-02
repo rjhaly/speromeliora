@@ -11,7 +11,6 @@ function processGetResponse(result) {
   var proj = document.getElementById("getProjectDisplay");
   var cons = document.getElementById("consoleMessageDisplay");
   var projecttname = document.getElementById("ShowProjectname");
-  var form = document.searchForm;
   
   var output = "";
   var output2 = "";
@@ -22,7 +21,7 @@ function processGetResponse(result) {
 			 "tasks: " 		  + js["project"]["tasks"] 		+ "<br>" +
 			 "teammates: " 	  + js["project"]["teammates"] 	+ "<br>" +
 			 "isArchived: "   + js["project"]["isArchived"] + "</p>";
-	output2 = "<p>" + form.searchProjectName.value + "</p>";
+	output2 = "<p>" + js["project"]["pid"] + "</p>";
 	// Update computation result
 	proj.innerHTML = output;
 	cons.innerHTML = "<p>Console Message Display</p>";
