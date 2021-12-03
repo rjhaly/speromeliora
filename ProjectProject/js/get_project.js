@@ -36,7 +36,7 @@ function processGetResponse(result) {
 }
 
 function handleGetProjectClick(e){
-	var form = document.searchForm;
+	var form = document.getElementById("textBox").value;
 	
   var newURL = getProject_url + "/" + form.searchProjectName.value;
   console.log("JS:" + form.searchProjectName.value);
