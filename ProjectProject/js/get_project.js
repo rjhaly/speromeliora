@@ -23,7 +23,7 @@ function processGetResponse(result) {
 			 "isArchived: "   + js["project"]["isArchived"] + "</p>";
 		
 		
-	output2 = js.pid;
+	output2 = "js.project.pid";
 	// Update computation result
 	proj.innerHTML = output;
 	cons.innerHTML = "<p>Console Message Display</p>";
