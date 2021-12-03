@@ -22,7 +22,7 @@ function processGetResponse(result) {
 			 "teammates: " 	  + js["project"]["teammates"] 	+ "<br>" +
 			 "isArchived: "   + js["project"]["isArchived"] + "</p>";
 		
-	output2 = "<p>" + js["project"]["pid"] + "</p>";
+	output2 = js["project"]["pid"];
 	// Update computation result
 	proj.innerHTML = output;
 	cons.innerHTML = "<p>Console Message Display</p>";
