@@ -67,9 +67,11 @@ function handleProjectDeleteClick(e){
 			  var js = JSON.parse(xhr.responseText);
 			  var err = js["response"];
 			  alert (err);
+				window.location.reload();
     	 }
     } else {
       requestDelete("N/A");
+		window.location.reload();
     }
 
 }
