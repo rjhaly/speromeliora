@@ -118,6 +118,13 @@ p {text-align: center;}
 </style>
 </head>
 
+<script>
+    function setText7(obj){
+    var val = obj.value;
+    console.log(val);
+    document.getElementById('textBox').value = "hello";
+}
+</script>
 
 <body onload="initialize()">
 
@@ -136,6 +143,10 @@ p {text-align: center;}
 <div class="positionb" >
 <p> Project selected name: <input  id ="ShowProjectname" value ="none" onClick ="JavaScript:handleListProjectClick(this)"> 
 </p></div>
+
+<div class="positionb">
+<input type="button" id="searchButton" onClick="setText7(this)">
+</div>
 
 <div class = "positiona" >
 <div id = "projectListDisplay"></div>
