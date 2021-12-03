@@ -2,7 +2,7 @@ function processDeleteResponse(result) {
   // Can grab any DIV or SPAN HTML element and can then manipulate its
   // contents dynamically via javascript
   console.log("deleted :" + result);
-  
+ window.location.reload(); 
   refreshProjectsList();
 }
 
@@ -59,19 +59,17 @@ function handleProjectDeleteClick(e){
     if (xhr.readyState == XMLHttpRequest.DONE) {
     	 if (xhr.status == 200) {
 	      console.log ("XHR:" + xhr.responseText);
-	      requestDelete(xhr.responseText);
-			window.location.reload();
+	      requestDelete(xhr.responseText)
 
     	 } else {
     		 console.log("actual:" + xhr.responseText)
 			  var js = JSON.parse(xhr.responseText);
 			  var err = js["response"];
 			  alert (err);
-				window.location.reload();
     	 }
     } else {
       requestDelete("N/A");
-		window.location.reload();
+		
     }
 
 }
