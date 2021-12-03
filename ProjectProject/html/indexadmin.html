@@ -140,12 +140,10 @@ input[type=text], select {
 
 <div id="projectList"></div>
 
-
 <script>
-    function setText7(obj){
-    var val = obj.value;
-    console.log(val);
-    document.getElementById('textBox').value = getElementById("searchProjectName");
+
+function myserach() {
+  document.getElementById('textBox').value  = document.getElementById("Searchfrom").value;
 }
 </script>
   
@@ -154,24 +152,20 @@ input[type=text], select {
 </div>
 
 
-<div class="positionb">
-<p> Project Selected name:<input type="text" name="textBox" id="textBox" value=""/>
-</div>
+
 
 <div class = "positiona" >
 <div id = "projectListDisplay"></div>
 </div>
 
 <div class ="positionsearch">
-<form name="searchForm" method="get">
-<p>Project name: <input name="searchProjectName" value=""/>  
-   <input type="button" id="searchButton" value="Search Project" onClick="JavaScript:handleGetProjectClick(this);setText7(this)"
-   >
-</p>
-</form>
+Project name: <input type="text" id="Searchfrom" value="">
+ <input type="button" id="searchButton" value="Search Project" onClick="myserach();JavaScript:handleGetProjectClick(this)">
+ </div>
+
+<div class="positionb">
+<p> Project Selected name:<input type="text" name="textBox" id="textBox" value=""/>
 </div>
-
-
 
 
 <div class="dropdown">

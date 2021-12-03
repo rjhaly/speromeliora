@@ -40,7 +40,7 @@ function processDelete(name) {
 }
 
 function handleProjectDeleteClick(e){
-	var form = document.getElementById("textBox).value;
+	var form = document.getElementById("textBox").value;
 
   var data = {};
   data["arg1"] = form.searchProjectName.value;
