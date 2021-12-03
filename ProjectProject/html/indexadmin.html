@@ -118,13 +118,7 @@ p {text-align: center;}
 </style>
 </head>
 
-<script>
-    function setText7(obj){
-    var val = obj.value;
-    console.log(val);
-    document.getElementById('textBox').value = "hello";
-}
-</script>
+
 
 <body onload="initialize()">
 
@@ -135,17 +129,22 @@ p {text-align: center;}
 
 <div id="projectList"></div>
 
+
+<script>
+    function setText7(obj){
+    var val = obj.value;
+    console.log(val);
+    document.getElementById('textBox').value = "hello";
+}
+</script>
   
  <div class="positionc">
 	<input type = "button" id = "GetProjectname" value = "Show projects" onClick ="JavaScript:handleListProjectClick(this)">
 </div>
 
-<div class="positionb" >
-<p> Project selected name: <input  id ="ShowProjectname" value ="none" onClick ="JavaScript:handleListProjectClick(this)"> 
-</p></div>
 
 <div class="positionb">
-<input type="button" id="searchButton" onClick="setText7(this)">
+<input type="text" name="textBox" id="textBox" value=""/>
 </div>
 
 <div class = "positiona" >
@@ -155,7 +154,7 @@ p {text-align: center;}
 <div class ="positionsearch">
 <form name="searchForm" method="get">
 <p>Project name: <input name="searchProjectName" value=""/>  
-   <input type="button" id="searchButton" value="Search Project" onClick="JavaScript:handleGetProjectClick(this)"
+   <input type="button" id="searchButton" value="Search Project" onClick="JavaScript:handleGetProjectClick(this);setText7(this)"
    >
 </p>
 </form>
