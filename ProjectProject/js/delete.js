@@ -60,6 +60,8 @@ function handleProjectDeleteClick(e){
     	 if (xhr.status == 200) {
 	      console.log ("XHR:" + xhr.responseText);
 	      requestDelete(xhr.responseText);
+		reload();
+
     	 } else {
     		 console.log("actual:" + xhr.responseText)
 			  var js = JSON.parse(xhr.responseText);
