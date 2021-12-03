@@ -33,7 +33,6 @@ function processGetResponse(result) {
 	output = "<p>Could not retrieve project</p>";
 	proj.innerHTML = "<p></p>";
 	cons.innerHTML = "<p>Console Message Display</p>";
-	projecttname.innerHTML = "none";
   }
 }
 
