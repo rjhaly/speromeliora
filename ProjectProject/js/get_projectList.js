@@ -22,7 +22,7 @@ function processGetListResponse(result) {
 						  "isArchived: "  + js["projects"][i]["isArchived"] +  "<br><br>";
 	}
 }
-  else{
+  else{ 
 	output = "Could not retrieve projects";
 }
 
