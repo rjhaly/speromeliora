@@ -22,7 +22,7 @@ function processGetResponse(result) {
 			 "teammates: " 	  + js["project"]["teammates"] 	+ "<br>" +
 			 "isArchived: "   + js["project"]["isArchived"] + "</p>";
 		
-	const namedisp  = JSON.stringify(result.project.pid);
+	const namedisp  = JSON.stringify(result.pid);
 		
 	output2 = namedisp;
 	// Update computation result
