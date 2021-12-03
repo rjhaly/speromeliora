@@ -72,6 +72,7 @@ public class ProjectDAO {
             	resultSet = ps.executeQuery();
             	
             	while(resultSet.next()) {
+            		logger.log("found value in lookup table");
             		String attribute;
             		if(resultSet.getString("tsk_id") != null) {
             			logger.log("Looking at task id " + resultSet.getInt("tsk_id"));
@@ -140,7 +141,13 @@ public class ProjectDAO {
             	
             	while(resultSet1.next()) {
             		String attribute;
-            		if((attribute = resultSet1.getString("tsk_id")) != null) {
+            		if(resultSet1.getString("tsk_id") != null) {
+            			logger.log("Looking at task id " + resultSet1.getInt("tsk_id"));
+            			PreparedStatement ps2 = conn.prepareStatement("SELECT * FROM tasks WHERE tsk_id = ?;");
+            			ps2.setInt(1, resultSet1.getInt("tsk_id"));
+            			ResultSet resultSet2 = ps2.executeQuery();
+            			logger.log("" + resultSet2.next());
+            			attribute = resultSet2.getNString("tsk_name");
             			tasks.add(attribute);
             		}
             		else {
@@ -302,6 +309,36 @@ public class ProjectDAO {
         } catch (Exception e) {
         	logger.log("exception thrown");
             throw new Exception("Failed to mark task: " + "could not find task");
+        }
+    }
+    
+    public Project renameTask(int tid, String name) throws Exception {
+    	try {
+            PreparedStatement ps = conn.prepareStatement("SELECT * FROM tasks WHERE tsk_id = ?;");
+            ps.setInt(1, tid);
+            ResultSet resultSet = ps.executeQuery();
+            if(!resultSet.next()) {
+            	throw new Exception("Failed to rename task: " + "Unable to find task");
+            }
+            logger.log("task found");
+            ps =conn.prepareStatement("UPDATE tasks SET tsk_name = ? WHERE tsk_id = ?");
+            ps.setString(1, name);
+            ps.setInt(2, tid);
+            ps.execute();
+            logger.log("task updated");
+            ps = conn.prepareStatement("SELECT * FROM lookup_table WHERE tsk_id = ?;");
+            ps.setInt(1, tid);
+            resultSet = ps.executeQuery();
+            if(!resultSet.next()) {
+            	throw new Exception("Failed to rename task: " + "could not find task in lookup table");
+            }
+            String pid = resultSet.getString("pid");
+            return getProject(pid);
+            
+            
+        } catch (Exception e) {
+        	logger.log("exception thrown");
+            throw new Exception("Failed to rename task: " + e.getMessage());
         }
     }
     }
