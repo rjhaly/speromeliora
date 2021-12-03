@@ -22,8 +22,9 @@ function processGetResponse(result) {
 			 "teammates: " 	  + js["project"]["teammates"] 	+ "<br>" +
 			 "isArchived: "   + js["project"]["isArchived"] + "</p>";
 		
+	const namedisp  = JSON.stringify(result.project.pid);
 		
-	output2 = js["project"]["pid"];
+	output2 = namedisp;
 	// Update computation result
 	proj.innerHTML = output;
 	cons.innerHTML = "<p>Console Message Display</p>";
@@ -32,7 +33,7 @@ function processGetResponse(result) {
 	output = "<p>Could not retrieve project</p>";
 	proj.innerHTML = "<p></p>";
 	cons.innerHTML = "<p>Console Message Display</p>";
-	projecttname.innerHTML = "<p></p>";
+	projecttname.innerHTML = "none";
   }
 }
 
