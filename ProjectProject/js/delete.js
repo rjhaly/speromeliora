@@ -60,7 +60,7 @@ function handleProjectDeleteClick(e){
     	 if (xhr.status == 200) {
 	      console.log ("XHR:" + xhr.responseText);
 	      requestDelete(xhr.responseText);
-		location.reload();
+		document.location.reload(true);
 
     	 } else {
     		 console.log("actual:" + xhr.responseText)
