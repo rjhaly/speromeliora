@@ -22,12 +22,11 @@ function processGetResponse(result) {
 			 "teammates: " 	  + js["project"]["teammates"] 	+ "<br>" +
 			 "isArchived: "   + js["project"]["isArchived"] + "</p>";
 		
-	output2  = JSON.stringify(result.pid);
+	projecttname.innerHTML  = JSON.stringify(result.pid);
 		
 	// Update computation result
 	proj.innerHTML = output;
 	cons.innerHTML = "<p>Console Message Display</p>";
-	projecttname.innerHTML = output2;
   } else if (js["statusCode"] == 400) {
 	output = "<p>Could not retrieve project</p>";
 	proj.innerHTML = "<p></p>";
