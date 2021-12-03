@@ -38,8 +38,8 @@ function processGetResponse(result) {
 function handleGetProjectClick(e){
 	var form = document.getElementById("Searchfrom").value;
 	
-  var newURL = getProject_url + "/" + form.searchProjectName.value;
-  console.log("JS:" + form.searchProjectName.value);
+  var newURL = getProject_url + "/" + document.getElementById("Searchfrom").value;
+  console.log("JS:" + document.getElementById("Searchfrom").value);
   var xhr = new XMLHttpRequest();
   xhr.open("GET", newURL, true);
   xhr.send();

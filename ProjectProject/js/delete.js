@@ -43,7 +43,7 @@ function handleProjectDeleteClick(e){
 	var form = document.getElementById("textBox").value;
 
   var data = {};
-  data["arg1"] = form.searchProjectName.value;
+  data["arg1"] = document.getElementById("textBox").value;
 
   var js = JSON.stringify(data);
   console.log("JS:" + js);
