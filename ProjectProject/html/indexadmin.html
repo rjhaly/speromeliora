@@ -25,8 +25,8 @@ p {text-align: center;}
 .positionb {
   margin: 0;
   position: absolute;
-  top: 22;
-  left: 17%;
+  top: 15px;'
+  left: 20px;
   -ms-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
 }
@@ -142,7 +142,7 @@ input[type=text], select {
 
 <script>
 
-function myserach() {
+function projectselectedname() {
   document.getElementById('textBox').value  = document.getElementById("GetProjectname");
 }
 </script>
@@ -159,8 +159,8 @@ function myserach() {
 </div>
 
 <div class ="positionsearch">
-Project name: <input type="text" id="Searchfrom" value="">
- <input type="button" id="searchButton" value="Search Project" onClick="myserach();JavaScript:handleGetProjectClick(this)">
+Project name: <input type="text" id="Searchproject" value="">
+ <input type="button" id="searchButton" value="Search Project" onClick="projectselectedname();JavaScript:handleGetProjectClick(this)">
  </div>
 
 <div class="positionb">
