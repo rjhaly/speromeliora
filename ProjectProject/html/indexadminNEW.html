@@ -42,15 +42,6 @@ p {text-align: center;}
 
 
 
-.positionc {
-  margin: 0;
-  position: absolute;
-  top: 30%;
-  left: 50%;
-  -ms-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%);
-}
-
 .positiona {
   margin: 0;
   position: absolute;
@@ -142,12 +133,6 @@ input[type=text], select {
 
 <div id="projectList"></div>
 
-  
- <div class="positionc">
-	<input type = "button" id = "Projectname" value = "Show projects" onClick ="JavaScript:handleListProjectClick(this)">
-</div>
-
-
 
 
 <div class = "positiona" >
@@ -158,6 +143,8 @@ input[type=text], select {
 <p>Project name: <input name="searchProjectName"/>  
    <input type="button" id="searchButton" value="Search Project" onClick="JavaScript:handleGetProjectClick(this)"/>
 </p>
+<div id="consoleMessageDisplay" class="center"><p>Console Message Display</p></div>
+<input type = "button" id = "Projectname" value = "Show projects" onClick ="JavaScript:handleListProjectClick(this)">
 </form>
 
 
