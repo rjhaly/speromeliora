@@ -5,7 +5,7 @@
 <script type='text/javascript' src='../js/get_projectList.js'></script>
 <script type='text/javascript' src='../js/get_project_NEW.js'></script>
 <script type='text/javascript' src='../js/create.js'></script>
-<script type='text/javascript' src='../js/delete.js'></script>
+<script type='text/javascript' src='../js/deleteNew.js'></script>
 <script type='text/javascript' src='../js/add_teammate.js'></script>
 
 
@@ -41,15 +41,6 @@ p {text-align: center;}
 }
 
 
-
-.positionc {
-  margin: 0;
-  position: absolute;
-  top: 30%;
-  left: 50%;
-  -ms-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%);
-}
 
 .positiona {
   margin: 0;
@@ -133,7 +124,7 @@ input[type=text], select {
 
 <body onload="initialize()">
 
-<div style="visibility: hidden" id= workingProject> </div>
+
 
 <h1> ADMIN Project Manager: <i>Project View</i></h1>
 
@@ -142,21 +133,19 @@ input[type=text], select {
 
 <div id="projectList"></div>
 
-  
- <div class="positionc">
-	<input type = "button" id = "Projectname" value = "Show projects" onClick ="JavaScript:handleListProjectClick(this)">
-</div>
-
-
 
 
 <div class = "positiona" >
 <div id = "projectListDisplay"></div>
+<div style="visibility: hidden" id= workingProject> </div>
 </div>
 
 <form name="searchForm" method="get">
 <p>Project name: <input name="searchProjectName"/>  
    <input type="button" id="searchButton" value="Search Project" onClick="JavaScript:handleGetProjectClick(this)"/>
+</p>
+<div id="consoleMessageDisplay" class="center"><p></p></div>
+<p><input type = "button" id = "Projectname" value = "Show projects" onClick ="JavaScript:handleListProjectClick(this)">
 </p>
 </form>
 
