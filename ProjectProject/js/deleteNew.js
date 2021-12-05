@@ -40,10 +40,10 @@ function processDelete(name) {
 }
 
 function handleProjectDeleteClick(e){
-	var form = document.getElementById("textBox").value;
+	var form = document.getElementById("Projectname").value;
 
   var data = {};
-  data["arg1"] = document.getElementById("textBox").value;
+  data["arg1"] = document.getElementById("Projectname").value;
 
   var js = JSON.stringify(data);
   console.log("JS:" + js);
