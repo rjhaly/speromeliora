@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-<script type='text/javascript' src='../js/api.js'></script>
+<script type='text/javascript' src='../js/api_NEW.js'></script>
 <script type='text/javascript' src='../js/get_projectList.js'></script>
-<script type='text/javascript' src='../js/get_project.js'></script>
+<script type='text/javascript' src='../js/get_project_NEW.js'></script>
 <script type='text/javascript' src='../js/create.js'></script>
 <script type='text/javascript' src='../js/delete.js'></script>
 <script type='text/javascript' src='../js/add_teammate.js'></script>
@@ -133,6 +133,8 @@ input[type=text], select {
 
 <body onload="initialize()">
 
+<div style="visibility: hidden" id= workingProject> </div>
+
 <h1> ADMIN Project Manager: <i>Project View</i></h1>
 
 
@@ -140,12 +142,6 @@ input[type=text], select {
 
 <div id="projectList"></div>
 
-<script>
-
-function projectselectedname() {
-  document.getElementById('textBox').value  = document.getElementById("GetProjectname");
-}
-</script>
   
  <div class="positionc">
 	<input type = "button" id = "Projectname" value = "Show projects" onClick ="JavaScript:handleListProjectClick(this)">
@@ -158,14 +154,11 @@ function projectselectedname() {
 <div id = "projectListDisplay"></div>
 </div>
 
-<div class ="positionsearch">
-Project name: <input type="text" id="Searchproject" value="">
- <input type="button" id="searchButton" value="Search Project" onClick="projectselectedname();JavaScript:handleGetProjectClick(this)">
- </div>
-
-<div class="positionb">
-<p> Project Selected name:<input type="text" name="textBox" id="textBox" value="none"/>
-</div>
+<form name="searchForm" method="get">
+<p>Project name: <input name="searchProjectName"/>  
+   <input type="button" id="searchButton" value="Search Project" onClick="JavaScript:handleGetProjectClick(this)"/>
+</p>
+</form>
 
 
 <div class="dropdown">
@@ -176,8 +169,7 @@ Project name: <input type="text" id="Searchproject" value="">
   </div>
 </div>
 
-<div id="consoleMessageDisplay" class="center"><p>Console Message Display</p></div>
-<div id ="GetProjectname" style="display: none;"></div>
+
 
 
 
