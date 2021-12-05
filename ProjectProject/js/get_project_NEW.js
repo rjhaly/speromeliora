@@ -10,10 +10,8 @@ function processGetResponse(result) {
   var js = JSON.parse(result);
   var proj = document.getElementById("getProjectDisplay");
   var cons = document.getElementById("consoleMessageDisplay");
-  var projecttname = document.getElementById("GetProjectname");
   var workingProject = document.getElementById("workingProject");
   var output = "";
-  var output2 = "";
 
   if(js["statusCode"] == 200){
 	output = "<p>" +
@@ -22,9 +20,6 @@ function processGetResponse(result) {
 			 "task identifiers: " + js["project"]["identifiers"] + "<br>" +
 			 "teammates: " 	  + js["project"]["teammates"] 	+ "<br>" +
 			 "isArchived: "   + js["project"]["isArchived"] + "</p>";
-		
-	
-		
 	// Update computation result
 	proj.innerHTML = output;
 	cons.innerHTML = "<p>Console Message Display</p>";
@@ -32,7 +27,7 @@ function processGetResponse(result) {
   } else if (js["statusCode"] == 400) {
 	output = "<p>Could not retrieve project</p>";
 	proj.innerHTML = "<p></p>";
-	cons.innerHTML = "<p>Console Message Display</p>";
+	cons.innerHTML = output;
   }
 }
 
