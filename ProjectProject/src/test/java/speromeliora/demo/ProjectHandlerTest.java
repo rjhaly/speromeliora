@@ -30,6 +30,8 @@ import speromeliora.http.DeleteProjectRequest;
 import speromeliora.http.DeleteProjectResponse;
 import speromeliora.http.GetProjectResponse;
 import speromeliora.http.ListProjectResponse;
+import speromeliora.http.RenameTaskRequest;
+import speromeliora.http.RenameTaskResponse;
 import speromeliora.model.Project;
 
 /**
@@ -134,6 +136,7 @@ public class ProjectHandlerTest extends LambdaTest{
         ArrayList<Project> testProjies = new ArrayList<>();
         testProjies.add(project);
         ListProjectHandler handler = new ListProjectHandler();
+        
 		ListProjectResponse response = handler.handleRequest(SAMPLE_INPUT_STRING, createContext("compute"));
 		for(int i = 0; i < testProjies.size(); i++) {
 		 Assert.assertEquals(testProjies.get(i).getPid(), response.projects.get(i).getPid());
@@ -142,5 +145,16 @@ public class ProjectHandlerTest extends LambdaTest{
 		 Assert.assertEquals(testProjies.get(i).getTasks(), response.projects.get(i).getTasks());
 	        Assert.assertEquals(200, response.statusCode);
 		}
+    }
+    @Test
+    public void testRenameProjectHandler() {
+    	String SAMPLE_INPUT_STRING = "{\"arg1\": \"31\", \"arg2\": \"quintilly\"}";
+        Project project = new Project("project1", new ArrayList<String>(), new ArrayList<String>(), false);
+        ArrayList<Project> testProjies = new ArrayList<>();
+        testProjies.add(project);
+        RenameTaskHandler handler = new RenameTaskHandler();
+        RenameTaskRequest req = new Gson().fromJson(SAMPLE_INPUT_STRING, RenameTaskRequest.class);
+		RenameTaskResponse response = handler.handleRequest(req, createContext("compute"));
+
     }
 }

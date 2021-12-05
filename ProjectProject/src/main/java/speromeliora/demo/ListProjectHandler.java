@@ -34,6 +34,7 @@ public class ListProjectHandler implements RequestHandler<Object, ListProjectRes
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 				projects = null;
+				//i hate fat stoopid bitches
 			}
 
 			// compute proper response and return. Note that the status code is internal to the HTTP response

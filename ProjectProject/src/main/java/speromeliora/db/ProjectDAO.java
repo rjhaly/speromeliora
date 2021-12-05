@@ -164,7 +164,7 @@ public class ProjectDAO {
             throw new Exception("Unable to retrieve Project: " + e.getMessage());
         }
     }
-    public ArrayList<Task> addTasks(String[] tasks, String parentTask, String pid) throws Exception {
+    public Project addTasks(String[] tasks, String parentTask, String pid) throws Exception {
         try {
         	ArrayList<Task> newTasks = new ArrayList<Task>();
         	logger.log("starting to create task");
@@ -173,7 +173,7 @@ public class ProjectDAO {
         	ResultSet resultSet = ps.executeQuery();
         	
         	if(!resultSet.next()) {
-        		throw new Exception("Failed to add task: could not find project");
+        		throw new Exception("Fai	led to add task: could not find project");
         	}	
         	for(int i = 0; i < tasks.length; i++) {
         		logger.log("creating a new task");
@@ -221,7 +221,7 @@ public class ProjectDAO {
 	            ps.execute();
 	            logger.log("finished creating new task");
         	}
-        	return newTasks;
+        	return getProject(pid);
         } catch (Exception e) {
             throw new Exception("Failed to add task: " + e.getMessage());
         }
@@ -333,7 +333,10 @@ public class ProjectDAO {
             	throw new Exception("Failed to rename task: " + "could not find task in lookup table");
             }
             String pid = resultSet.getString("pid");
-            return getProject(pid);
+            logger.log("returning project " + pid) ;
+            Project updatedProject = getProject(pid);
+            return updatedProject;
+            //bros before hoes except without clothes
             
             
         } catch (Exception e) {
