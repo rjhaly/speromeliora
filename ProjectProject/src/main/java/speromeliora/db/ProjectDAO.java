@@ -66,6 +66,7 @@ public class ProjectDAO {
             	String name = pid;
             	ArrayList<String> tasks = new ArrayList<>();
             	ArrayList<String> teammates= new ArrayList<>();
+            	ArrayList<String> identifiers = new ArrayList<>();
             	boolean isArchived = resultSet.getBoolean("isArchived");
             	ps = conn.prepareStatement("SELECT * FROM lookup_table WHERE pid = ?;");
             	ps.setString(1, pid);
@@ -82,13 +83,14 @@ public class ProjectDAO {
             			logger.log("" + resultSet1.next());
             			attribute = resultSet1.getNString("tsk_name");
             			tasks.add(attribute);
+            			identifiers.add(resultSet1.getNString("tsk_identifier"));
             		}
             		else {
             			attribute = resultSet.getNString("tmt_id");
             			teammates.add(attribute);
             		}
             	}
-            	Project project = new Project(name, tasks, teammates, isArchived);
+            	Project project = new Project(name, tasks, teammates, identifiers, isArchived);
             	return project;
             }
             
@@ -116,7 +118,11 @@ public class ProjectDAO {
     
     public void deleteProject(String pid) throws Exception {
         try {
+        	logger.log("deleting project: " + pid);
             PreparedStatement ps = conn.prepareStatement("DELETE FROM projects WHERE pid = ?;");
+            ps.setString(1, pid);
+            ps.execute();
+            ps = conn.prepareStatement("DELETE FROM lookup_table WHERE pid = ?;");
             ps.setString(1, pid);
             ps.execute();
         } catch (Exception e) {
@@ -134,6 +140,7 @@ public class ProjectDAO {
             	boolean isArchived = resultSet.getBoolean("isArchived");
             	ArrayList<String> tasks = new ArrayList<>();
             	ArrayList<String> teammates= new ArrayList<>();
+            	ArrayList<String> identifiers = new ArrayList<>();
             	
             	PreparedStatement ps1 = conn.prepareStatement("SELECT * FROM lookup_table WHERE pid = ?;");
             	ps1.setString(1, pid);
@@ -149,13 +156,14 @@ public class ProjectDAO {
             			logger.log("" + resultSet2.next());
             			attribute = resultSet2.getNString("tsk_name");
             			tasks.add(attribute);
+            			identifiers.add(resultSet2.getNString("tsk_identifier"));
             		}
             		else {
             			attribute = resultSet1.getNString("tmt_id");
             			teammates.add(attribute);
             		}
             	}
-            	Project project = new Project(pid, tasks, teammates, isArchived);
+            	Project project = new Project(pid, tasks, teammates, identifiers, isArchived);
             	projects.add(project);
             }
             return projects;
@@ -194,16 +202,41 @@ public class ProjectDAO {
         			PreparedStatement ps1 = conn.prepareStatement("SELECT * FROM projects WHERE tsk_id = ?;");
                     ps1.setString(1, parentTask);
                     resultSet = ps1.executeQuery();
-                    String identifier ="" + resultSet.getString("tsk_identifier") + "." + i;
+                    String identifier ="" + resultSet.getString("tsk_identifier") + "." + (i + 1);
                     ps.setNString(3, identifier);
                     task.setTaskIdentifier(identifier);
         		}
         		else {
         			logger.log("creating task without parent");
         			ps.setNString(2, null);
-        			ps.setNString(3, i + "");
-        			task.setTaskIdentifier((i + 1) + "");
-        		}
+        			PreparedStatement ps2 = conn.prepareStatement("SELECT * FROM lookup_table WHERE pid = ?;",
+                            ResultSet.TYPE_SCROLL_SENSITIVE, 
+                        ResultSet.CONCUR_UPDATABLE);
+        			ps2.setNString(1, pid);
+        			ResultSet resultSet2 = ps2.executeQuery();
+        			if(!resultSet2.next()) {
+        				logger.log("adding base task");
+        				ps.setNString(3, "1");
+            			task.setTaskIdentifier("1");
+        			}
+        			else {
+        			logger.log("before last");
+        			resultSet2.last();
+        			logger.log("after last");
+        			String lastTskID = resultSet2.getString("tsk_id");
+        			logger.log("found task: " + lastTskID);
+        			ps2 = conn.prepareStatement("SELECT * FROM tasks WHERE tsk_id = ?;");
+        			ps2.setNString(1, lastTskID);
+        			resultSet2 = ps2.executeQuery();
+        			resultSet2.next();
+        			String lastIdent = resultSet2.getString("tsk_identifier");
+        			logger.log("last identifier:" + lastIdent +"");
+        			int identNum = Integer.parseInt(lastIdent); 
+        			int newIdent = identNum + 1;
+        			String newIdentifier = String.valueOf(newIdent);
+        			ps.setNString(3, newIdentifier);
+        			task.setTaskIdentifier(newIdentifier);
+        		}}
 	            ps.execute();
 	            logger.log("added task to db");
 	            ps = conn.prepareStatement("SELECT * FROM tasks WHERE tsk_id=(SELECT max(tsk_id) FROM tasks);");

@@ -12,6 +12,7 @@ function processAddTasksResponse(result) {
 	output = "<p>" +
 			 "Project Name: " + js["project"]["pid"] 		+ "<br>" +
 			 "tasks: " 		  + js["project"]["tasks"] 		+ "<br>" +
+			 "task identifiers: " + js["project"]["identifiers"] + "<br>" +
 			 "teammates: " 	  + js["project"]["teammates"] 	+ "<br>" +
 			 "isArchived: "   + js["project"]["isArchived"] + "</p>";
 	// Update computation result
@@ -30,7 +31,7 @@ function handleAddTasksClick(e) {
   var data = {};
   data["arg1"] = tasksForm.addTasksName.value;
   data["arg2"] = "";
-  data["arg3"] = projectForm.searchProjectName.value;
+  data["arg3"] = document.getElementById("workingProject").innerHTML;
 
   var js = JSON.stringify(data);
   console.log("JS:" + js);

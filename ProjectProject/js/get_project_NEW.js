@@ -11,6 +11,7 @@ function processGetResponse(result) {
   var proj = document.getElementById("getProjectDisplay");
   var cons = document.getElementById("consoleMessageDisplay");
   var projecttname = document.getElementById("GetProjectname");
+  var workingProject = document.getElementById("workingProject");
   var output = "";
   var output2 = "";
 
@@ -18,6 +19,7 @@ function processGetResponse(result) {
 	output = "<p>" +
 			 "Project Name: " + js["project"]["pid"] 		+ "<br>" +
 			 "tasks: " 		  + js["project"]["tasks"] 		+ "<br>" +
+			 "task identifiers: " + js["project"]["identifiers"] + "<br>" +
 			 "teammates: " 	  + js["project"]["teammates"] 	+ "<br>" +
 			 "isArchived: "   + js["project"]["isArchived"] + "</p>";
 		
@@ -26,6 +28,7 @@ function processGetResponse(result) {
 	// Update computation result
 	proj.innerHTML = output;
 	cons.innerHTML = "<p>Console Message Display</p>";
+	workingProject.innerHTML = js["project"]["pid"];
   } else if (js["statusCode"] == 400) {
 	output = "<p>Could not retrieve project</p>";
 	proj.innerHTML = "<p></p>";

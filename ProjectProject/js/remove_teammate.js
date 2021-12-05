@@ -14,6 +14,7 @@ function processRemoveTeammateResponse(result) {
 	output = "<p>" +
 			 "Project Name: " + js["project"]["pid"] 		+ "<br>" +
 			 "tasks: " 		  + js["project"]["tasks"] 		+ "<br>" +
+			 "task identifiers: " + js["project"]["identifiers"] + "<br>" +
 			 "teammates: " 	  + js["project"]["teammates"] 	+ "<br>" +
 			 "isArchived: "   + js["project"]["isArchived"] + "</p>";
 	// Update computation result
@@ -30,7 +31,7 @@ function handleRemoveTeammateClick(e) {
   var teammateForm = document.teammateForm;
  
   var data = {};
-  data["arg1"] = projectForm.searchProjectName.value;
+  data["arg1"] = document.getElementById("workingProject").innerHTML;
   data["arg2"] = teammateForm.addTeammateName.value;
 
   var js = JSON.stringify(data);
