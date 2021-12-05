@@ -172,7 +172,7 @@ public class ProjectDAO {
             throw new Exception("Unable to retrieve Project: " + e.getMessage());
         }
     }
-    public Project addTasks(String[] tasks, String parentTask, String pid) throws Exception {
+    public Project addTasks(String[] tasks, String parentTaskIdentifier, String pid) throws Exception {
         try {
         	ArrayList<Task> newTasks = new ArrayList<Task>();
         	logger.log("starting to create task");
@@ -196,15 +196,65 @@ public class ProjectDAO {
         				"INSERT INTO tasks (tsk_name, isComplete, isBottomLevel, parent_tsk_id, tsk_identifier) "
         				+ "values(?,false,true,?,?);");
         		ps.setString(1,  tasks[i]);
-        		if(parentTask != "") {
+        		if(parentTaskIdentifier != "") {
         			logger.log("creating task with parent");
-        			ps.setNString(2, parentTask);
-        			PreparedStatement ps1 = conn.prepareStatement("SELECT * FROM projects WHERE tsk_id = ?;");
-                    ps1.setString(1, parentTask);
-                    resultSet = ps1.executeQuery();
-                    String identifier ="" + resultSet.getString("tsk_identifier") + "." + (i + 1);
-                    ps.setNString(3, identifier);
-                    task.setTaskIdentifier(identifier);
+        			PreparedStatement ps1 = conn.prepareStatement("SELECT * FROM tasks WHERE tsk_identifier = ?;");
+        			ps1.setNString(1, parentTaskIdentifier);
+        			ResultSet resultSet1 = ps1.executeQuery();
+        			if(!resultSet1.next()) {
+        				throw new Exception("Failed to add task: Parent task identifier not found");
+        			}
+        			ArrayList<Integer> taskIDs = new ArrayList<>();
+        			logger.log("before first do");
+        			do {
+        				int taskID = resultSet1.getInt("tsk_id");
+        				taskIDs.add(taskID);
+        			}while(resultSet.next());
+        			logger.log("after first do");
+        			boolean taskFound = false;
+        			int foundTaskID = -1;
+        			String foundIdentifier = "";
+        			for(int j = 0; i < taskIDs.size(); i++) {
+        				ps1 = conn.prepareStatement("SELECT * FROM lookup_table WHERE tsk_id = ?;");
+        				ps1.setInt(1, taskIDs.get(j));
+        				resultSet1 = ps1.executeQuery();
+        				
+        				if(!resultSet1.next()) {
+            			}
+        				else {
+        					if(resultSet1.getString("pid").equals(pid)) {
+        						taskFound = true;
+        						foundTaskID = taskIDs.get(j);
+        					}
+        				}
+        			}
+        			if(!taskFound) {
+        				throw new Exception("Failed to add task: Parent task ID not associated with this project");
+        			}
+        			ps1 = conn.prepareStatement("SELECT * FROM tasks WHERE tsk_id = ?;");
+        			ps1.setInt(1, foundTaskID);
+        			resultSet1 = ps1.executeQuery();
+        			resultSet1.next();
+        			foundIdentifier = resultSet1.getString("tsk_identifier");
+        			
+        			ps.setInt(2, foundTaskID);
+        			ps1 = conn.prepareStatement("SELECT * FROM tasks WHERE parent_tsk_id = ?;");
+        			ps1.setInt(1, foundTaskID);
+        			resultSet1 = ps1.executeQuery();
+        			
+        			if(!resultSet1.next()) {
+        				String newIdent = foundIdentifier + "." + 1;
+        				ps.setNString(3, newIdent);
+        			}
+        			else {
+        				resultSet1.last();
+        				String lastIdent = resultSet1.getString("tsk_identifier");
+        				String lastNum = lastIdent.substring(lastIdent.length() - 1);
+        				int num = Integer.parseInt(lastNum);
+        				int newNum = num++;
+        				String newIdent = foundIdentifier + "." + newNum;
+        				ps.setNString(3, newIdent);
+        			}
         		}
         		else {
         			logger.log("creating task without parent");
