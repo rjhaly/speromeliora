@@ -33,7 +33,7 @@ public class RenameTaskHandler implements RequestHandler<RenameTaskRequest, Rena
         // Get the object from the event and show its content type
 		boolean fail = false;
 		String failMessage = "";
-		Project project = new Project();
+		Project updatedProject = new Project();
 		int tid = -1;
 		String name = "";
 		try {
@@ -45,7 +45,7 @@ public class RenameTaskHandler implements RequestHandler<RenameTaskRequest, Rena
 		}
 		if (tid != -1 && name != "") {
 			try {
-				renameTaskInRDS(tid, name);
+				updatedProject = renameTaskInRDS(tid, name);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -58,8 +58,9 @@ public class RenameTaskHandler implements RequestHandler<RenameTaskRequest, Rena
 		RenameTaskResponse response;
 		if (fail) {
 			response = new RenameTaskResponse(400, failMessage);
+			//eat ass smoke grass
 		} else {
-			response = new RenameTaskResponse(project, 200);  // success
+			response = new RenameTaskResponse(updatedProject, 200);  // success
 		}
 
 		return response; 

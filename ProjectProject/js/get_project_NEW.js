@@ -11,7 +11,7 @@ function processGetResponse(result) {
   var proj = document.getElementById("getProjectDisplay");
   var cons = document.getElementById("consoleMessageDisplay");
   var projecttname = document.getElementById("GetProjectname");
-  
+  var workingProject = document.getElementById("workingProject");
   var output = "";
   var output2 = "";
 
@@ -19,6 +19,7 @@ function processGetResponse(result) {
 	output = "<p>" +
 			 "Project Name: " + js["project"]["pid"] 		+ "<br>" +
 			 "tasks: " 		  + js["project"]["tasks"] 		+ "<br>" +
+			 "task identifiers: " + js["project"]["identifiers"] + "<br>" +
 			 "teammates: " 	  + js["project"]["teammates"] 	+ "<br>" +
 			 "isArchived: "   + js["project"]["isArchived"] + "</p>";
 		
@@ -27,6 +28,7 @@ function processGetResponse(result) {
 	// Update computation result
 	proj.innerHTML = output;
 	cons.innerHTML = "<p>Console Message Display</p>";
+	workingProject.innerHTML = js["project"]["pid"];
   } else if (js["statusCode"] == 400) {
 	output = "<p>Could not retrieve project</p>";
 	proj.innerHTML = "<p></p>";
@@ -36,10 +38,9 @@ function processGetResponse(result) {
 }
 
 function handleGetProjectClick(e){
-	var form = document.getElementById("Searchfrom").value;
+	var form = document.searchForm;
 	
-  var newURL = getProject_url + "/" + document.getElementById("Searchfrom").value;
-  console.log("JS:" + document.getElementById("Searchfrom").value);
+  var newURL = getProject_url + "/" + form.searchProjectName.value;
   var xhr = new XMLHttpRequest();
   xhr.open("GET", newURL, true);
   xhr.send();

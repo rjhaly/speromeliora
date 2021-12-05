@@ -12,6 +12,7 @@ import speromeliora.http.DeleteProjectRequest;
 import speromeliora.http.DeleteProjectResponse;
 import speromeliora.http.RemoveTeammateRequest;
 import speromeliora.http.RemoveTeammateResponse;
+import speromeliora.model.Project;
 
 public class RemoveTeammateHandler implements RequestHandler<RemoveTeammateRequest, RemoveTeammateResponse> {
 	private AmazonS3 s3 = null;
@@ -34,6 +35,7 @@ public class RemoveTeammateHandler implements RequestHandler<RemoveTeammateReque
 		String failMessage = "";
 		String pid = "";
 		String teammateName = "";
+		Project project = new Project();
 		try {
 			pid = req.getArg1();
 		} catch (NumberFormatException e) {
@@ -48,7 +50,7 @@ public class RemoveTeammateHandler implements RequestHandler<RemoveTeammateReque
 		}
 		if (pid != "" && teammateName != "") {
 			try {
-				removeTeammateInRDS(pid, teammateName);
+				project = removeTeammateInRDS(pid, teammateName);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -62,18 +64,19 @@ public class RemoveTeammateHandler implements RequestHandler<RemoveTeammateReque
 		if (fail) {
 			response = new RemoveTeammateResponse(400, failMessage);
 		} else {
-			response = new RemoveTeammateResponse(pid, 200);  // success
+			response = new RemoveTeammateResponse(project, 200);  // success
 		}
 
 		return response; 
 	}
     
-    public void removeTeammateInRDS(String pid, String teammateName) throws Exception {
+    public Project removeTeammateInRDS(String pid, String teammateName) throws Exception {
 		if (logger != null) { logger.log("in createProject"); }
 		ProjectDAO dao = new ProjectDAO(logger);
 		if (logger != null) { logger.log("retrieved DAO"); }
-		dao.removeTeammate(pid, teammateName);
+		Project project = dao.removeTeammate(pid, teammateName);
 		if (logger != null) { logger.log("removed Teammate"); }
+		return project;
 	}
 }
 

@@ -1,6 +1,4 @@
-
-
-function processRemoveTeammateResponse(result) {
+function processAddTasksResponse(result) {
   console.log("res:" + result);
   // Can grab any DIV or SPAN HTML element and can then manipulate its contents dynamically via javascript
   var js = JSON.parse(result);
@@ -21,23 +19,24 @@ function processRemoveTeammateResponse(result) {
 	proj.innerHTML = output;
 	cons.innerHTML = "<p>Console Message Display</p>";
   } else if (js["statusCode"] == 400) {
-	output = "<p>" + js["error"] + "</p>";
+	output = js["error"];
 	cons.innerHTML = output;
   }
   
 }
-function handleRemoveTeammateClick(e) {
+function handleAddTasksClick(e) {
   var projectForm = document.searchForm;
-  var teammateForm = document.teammateForm;
+  var tasksForm = document.addTasksForm;
  
   var data = {};
-  data["arg1"] = document.getElementById("workingProject").innerHTML;
-  data["arg2"] = teammateForm.addTeammateName.value;
+  data["arg1"] = tasksForm.addTasksName.value;
+  data["arg2"] = "";
+  data["arg3"] = document.getElementById("workingProject").innerHTML;
 
   var js = JSON.stringify(data);
   console.log("JS:" + js);
   var xhr = new XMLHttpRequest();
-  xhr.open("POST", removeTeammate_url, true);
+  xhr.open("POST", addTasks_url, true);
 
   // send the collected data as JSON
   xhr.send(js);
@@ -49,7 +48,7 @@ function handleRemoveTeammateClick(e) {
     if (xhr.readyState == XMLHttpRequest.DONE) {
     	 if (xhr.status == 200) {
 	      console.log ("XHR:" + xhr.responseText);
-	      processRemoveTeammateResponse(xhr.responseText);
+	      processAddTasksResponse(xhr.responseText);
     	 } else {
     		 console.log("actual:" + xhr.responseText)
 			  var js = JSON.parse(xhr.responseText);
@@ -57,7 +56,7 @@ function handleRemoveTeammateClick(e) {
 			  alert (err);
     	 }
     } else {
-      processRemoveTeammateResponse("N/A");
+      processAddTasksResponse("N/A");
     }
   };
 }

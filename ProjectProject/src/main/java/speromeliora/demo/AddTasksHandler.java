@@ -11,6 +11,7 @@ import speromeliora.db.ProjectDAO;
 import speromeliora.http.AddTaskRequest;
 import speromeliora.http.AddTaskResponse;
 import speromeliora.http.CreateProjectResponse;
+import speromeliora.model.Project;
 import speromeliora.model.Task;
 
 public class AddTasksHandler implements RequestHandler<AddTaskRequest, AddTaskResponse>{
@@ -32,7 +33,7 @@ public class AddTasksHandler implements RequestHandler<AddTaskRequest, AddTaskRe
 		boolean fail = false;
 		String failMessage = "";
 		String taskString = "";
-		ArrayList<Task> newTasks = new ArrayList<Task>();
+		Project updatedProject = new Project();
 		String parentTask = "";
 		String project = "";
 		try {
@@ -46,7 +47,7 @@ public class AddTasksHandler implements RequestHandler<AddTaskRequest, AddTaskRe
 		if (taskString != "" && project != "") {
 			try {
 				String[] tasks = taskString.split(",");
-				newTasks = addTasksInRDS(tasks, parentTask, project);
+				updatedProject = addTasksInRDS(tasks, parentTask, project);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -61,19 +62,19 @@ public class AddTasksHandler implements RequestHandler<AddTaskRequest, AddTaskRe
 		if (fail) {
 			response = new AddTaskResponse(400, failMessage);
 		} else {
-			response = new AddTaskResponse(newTasks, 200);  // success
+			response = new AddTaskResponse(updatedProject, 200);  // success
 		}
 
 		return response; 
 	}
     
-    public ArrayList<Task> addTasksInRDS(String[] tasks, String parentTask, String project) throws Exception {
+    public Project addTasksInRDS(String[] tasks, String parentTask, String project) throws Exception {
 		if (logger != null) { logger.log("in createProject"); }
 		ProjectDAO dao = new ProjectDAO(logger);
 		if (logger != null) { logger.log("retrieved DAO"); }
-		ArrayList<Task> newTasks = dao.addTasks(tasks, parentTask, project);
+		Project updatedProject = dao.addTasks(tasks, parentTask, project);
 		if (logger != null) { logger.log("created Project"); }
-		return newTasks;
+		return updatedProject;
 	}
 	}
 

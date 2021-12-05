@@ -3,12 +3,13 @@
 <head>
 
 <!-- relative path-name to access js -->
-<script type='text/javascript' src='../js/api.js'></script>
-<script type='text/javascript' src='../js/get_project.js'></script>
+<script type='text/javascript' src='../js/api_NEW.js'></script>
+<script type='text/javascript' src='../js/get_project_NEW.js'></script>
 <script type='text/javascript' src='../js/create.js'></script>
 <script type='text/javascript' src='../js/delete.js'></script>
 <script type='text/javascript' src='../js/add_teammate.js'></script>
 <script type='text/javascript' src='../js/remove_teammate.js'></script>
+<script type='text/javascript' src='../js/add_tasks.js'></script>
 
 <meta charset="UTF-8">
 <title>PROJECT MANAGER Project View</title>
@@ -51,7 +52,7 @@ p  {text-align: center;}
 
 </head>
 <body onload="initialize()">
-
+<div style="visibility: hidden" id= workingProject> </div>
 
 
 <h1> Project Manager: <i>Project View</i></h1>
@@ -68,20 +69,21 @@ p  {text-align: center;}
 <h2>Get Project</h2>
 
 <form name="searchForm" method="get">
-<p>Project name: <input name="searchProjectName" value=""/>  
+<p>Project name: <input name="searchProjectName"/>  
    <input type="button" id="searchButton" value="Search Project" onClick="JavaScript:handleGetProjectClick(this)"/>
 </p>
 </form>
 
-<div>
-Project name: <input type="text" id="Searchfrom" value="">
- <input type="button" id="searchButton" value="Search Projecttest" onClick="JavaScript:handleGetProjectClick(this)">
- </div>
-
 <form name="teammateForm" method="post">
-<p>Teammate name: <input name="addTeammateName" value=""/>
+<p>Teammate name: <input name="addTeammateName"/>
    <input type="button" id="addTeammateButton" value="Add Teammate" onClick="JavaScript:handleAddTeammateClick(this)"/>
    <input type = "button" id="removeTeammateButton" value="Remove Teammate" onClick="JavaScript:handleRemoveTeammateClick(this)"/>
+</p>
+</form>
+
+<form name="addTasksForm" method="post">
+<p>Task names: <input name="addTasksName"/>
+   <input type="button" id="addTasksButton" value="Add Tasks" onClick="JavaScript:handleAddTasksClick(this)"/>
 </p>
 </form>
 

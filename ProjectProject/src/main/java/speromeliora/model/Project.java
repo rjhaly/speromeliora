@@ -6,12 +6,14 @@ public class Project {
 	String pid;
 	ArrayList<String> tasks;
 	ArrayList<String> teammates;
+	ArrayList<String> identifiers;
 	boolean isArchived;
 	
-	public Project(String projectID, ArrayList<String> newtasks, ArrayList<String> newteammates, boolean archived) {
+	public Project(String projectID, ArrayList<String> newtasks, ArrayList<String> newteammates, ArrayList<String> newIdentifiers, boolean archived) {
 		pid = projectID;
 		tasks = newtasks;
 		teammates = newteammates;
+		identifiers = newIdentifiers;
 		isArchived = archived;
 	}
 	
@@ -36,6 +38,12 @@ public class Project {
 	}
 	public void setTeammates(ArrayList<String> newTeammates) {
 		teammates = newTeammates;
+	}
+	public ArrayList<String> getIdentifiers(){
+		return identifiers;
+	}
+	public void setIdentifiers(ArrayList<String> newIdentifiers) {
+		identifiers = newIdentifiers;
 	}
 	public boolean getIsArchived() {
 		return isArchived;
