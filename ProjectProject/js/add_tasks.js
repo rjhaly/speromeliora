@@ -30,7 +30,7 @@ function handleAddTasksClick(e) {
  
   var data = {};
   data["arg1"] = tasksForm.addTasksName.value;
-  data["arg2"] = "";
+  data["arg2"] = tasksForm.addTasksID.value;
   data["arg3"] = document.getElementById("workingProject").innerHTML;
 
   var js = JSON.stringify(data);
