@@ -272,12 +272,13 @@ public class ProjectDAO {
             throw new Exception("Unable to add Teammate: " + e.getMessage());
         }
     }
-    public void removeTeammate(String pid, String teammateName) throws Exception {
+    public Project removeTeammate(String pid, String teammateName) throws Exception {
         try {
             PreparedStatement ps = conn.prepareStatement("DELETE FROM lookup_table WHERE pid = ? && tmt_id = ?;");
             ps.setString(1, pid);
             ps.setNString(2, teammateName);
             ps.execute();
+            return getProject(pid);
         } catch (Exception e) {
             throw new Exception("Failed to remove teammate: " + e.getMessage());
         }
