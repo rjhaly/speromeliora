@@ -82,8 +82,24 @@ public class ProjectDAO {
             			ResultSet resultSet1 = ps1.executeQuery();
             			logger.log("" + resultSet1.next());
             			attribute = resultSet1.getNString("tsk_name");
-            			tasks.add(attribute);
-            			identifiers.add(resultSet1.getNString("tsk_identifier"));
+            			if(identifiers.size() == 0) {
+            				tasks.add(attribute);
+            				identifiers.add(resultSet1.getNString("tsk_identifier"));
+            			}
+            			else {
+            			for(int i = 0; i < identifiers.size(); i++) {
+            				if(resultSet1.getNString("tsk_identifier").compareTo(identifiers.get(i)) < 0) {
+            					tasks.add(i,attribute);
+            					identifiers.add(i,resultSet1.getNString("tsk_identifier"));
+            					break;
+            				}
+            				else if(i == identifiers.size() - 1) {
+            					tasks.add(i + 1,attribute);
+            					identifiers.add(i + 1,resultSet1.getNString("tsk_identifier"));
+            					break;
+            				}            				
+            			}
+            			}
             		}
             		else {
             			attribute = resultSet.getNString("tmt_id");
