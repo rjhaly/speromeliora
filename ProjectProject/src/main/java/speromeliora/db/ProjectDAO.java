@@ -260,6 +260,7 @@ public class ProjectDAO {
         			resultSet1 = ps1.executeQuery();
         			
         			if(!resultSet1.next()) {
+        				logger.log("in base case");
         				String newIdent = foundIdentifier + "." + 1;
         				ps.setNString(3, newIdent);
         			}
@@ -268,9 +269,15 @@ public class ProjectDAO {
         				String lastIdent = resultSet1.getString("tsk_identifier");
         				String lastNum = lastIdent.substring(lastIdent.length() - 1);
         				int num = Integer.parseInt(lastNum);
-        				int newNum = num++;
+        				logger.log("new task identifier last number: " + num + "plus 1");
+        				int newNum = num + 1;
         				String newIdent = foundIdentifier + "." + newNum;
         				ps.setNString(3, newIdent);
+        			}
+        			if(foundTaskID != -1) {
+        				ps1 = conn.prepareStatement("UPDATE tasks SET isBottomLevel = false WHERE tsk_id = ?;");
+        				ps1.setInt(1, foundTaskID);
+        				ps1.execute();
         			}
         		}
         		else {
@@ -329,6 +336,7 @@ public class ProjectDAO {
 	            ps.execute();
 	            logger.log("finished creating new task");
         	}
+        	
         	return getProject(pid);
         } catch (Exception e) {
             throw new Exception("Failed to add task: " + e.getMessage());
