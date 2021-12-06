@@ -114,7 +114,7 @@ public class ProjectDAO {
             throw new Exception("Unable to retrieve Project: " + e.getMessage());
         }
     }
-    public void archiveProject(String pid) throws Exception {
+    public Project archiveProject(String pid) throws Exception {
         try {
             PreparedStatement ps = conn.prepareStatement("SELECT * FROM projects WHERE pid = ?;");
             ps.setString(1, pid);
@@ -126,6 +126,7 @@ public class ProjectDAO {
             ps =conn.prepareStatement("UPDATE projects SET isArchived = true WHERE pid = ?");
             ps.setNString(1, pid);
             ps.execute();
+            return getProject(pid);
         } catch (Exception e) {
         	logger.log("exception thrown");
             throw new Exception("Failed to archive project: " + "project ID does not exist");

@@ -8,6 +8,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import speromeliora.db.ProjectDAO;
 import speromeliora.http.ArchiveProjectRequest;
 import speromeliora.http.ArchiveProjectResponse;
+import speromeliora.model.Project;
 
 public class ArchiveProjectHandler implements RequestHandler<ArchiveProjectRequest, ArchiveProjectResponse>{
 	private AmazonS3 s3 = null;
@@ -29,6 +30,7 @@ public class ArchiveProjectHandler implements RequestHandler<ArchiveProjectReque
 		boolean fail = false;
 		String failMessage = "";
 		String pid = "";
+		Project project = new Project();
 		try {
 			pid = req.getArg1();
 		} catch (NumberFormatException e) {
@@ -37,7 +39,7 @@ public class ArchiveProjectHandler implements RequestHandler<ArchiveProjectReque
 		}
 		if (pid != "") {
 			try {
-				archiveProjectInRDS(pid);
+				project = archiveProjectInRDS(pid);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -51,17 +53,18 @@ public class ArchiveProjectHandler implements RequestHandler<ArchiveProjectReque
 		if (fail) {
 			response = new ArchiveProjectResponse(400, failMessage);
 		} else {
-			response = new ArchiveProjectResponse(pid, 200);  // success
+			response = new ArchiveProjectResponse(project, 200);  // success
 		}
 
 		return response; 
 	}
     
-    public void archiveProjectInRDS(String pid) throws Exception {
+    public Project archiveProjectInRDS(String pid) throws Exception {
 		if (logger != null) { logger.log("in createProject"); }
 		ProjectDAO dao = new ProjectDAO(logger);
 		if (logger != null) { logger.log("retrieved DAO"); }
-		dao.archiveProject(pid);
+		Project project = dao.archiveProject(pid);
 		if (logger != null) { logger.log("archived Project"); }
+		return project;
 	}
 }

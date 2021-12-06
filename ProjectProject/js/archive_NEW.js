@@ -1,4 +1,4 @@
-function processArchive(response) {
+function processArchive(result) {
 	
 	
 	console.log("res:" + result);
