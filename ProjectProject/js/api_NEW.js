@@ -10,5 +10,6 @@ var removeTeammate_url = base_url + "teammateRemoval";
 var deleteProject_url  = base_url + "projectDeletion";
 var addTasks_url       = base_url + "taskAddition";
 var renameTask_url	   = base_url + "taskRename";
+var archive_url		   = base_url + "archive";
 
 // var delete_url = base_url + "projects";    // POST with {name}   [challenge in getting DELETE to work]
