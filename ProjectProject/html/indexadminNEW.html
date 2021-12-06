@@ -5,8 +5,9 @@
 <script type='text/javascript' src='../js/get_projectList.js'></script>
 <script type='text/javascript' src='../js/get_project_NEW.js'></script>
 <script type='text/javascript' src='../js/create.js'></script>
-<script type='text/javascript' src='../js/deleteNew.js'></script>
+<script type='text/javascript' src='../js/delete.js'></script>
 <script type='text/javascript' src='../js/add_teammate.js'></script>
+<script type='text/javascript' src='../js/archive.js'></script>
 
 
 <meta charset="UTF-8">
@@ -154,7 +155,7 @@ input[type=text], select {
   <button class="dropbtn"> <div id ="getProjectDisplay"></div></button>
   <div class="dropdown-content">
     <button onClick ="JavaScript:handleProjectDeleteClick(this)" class="button button2">Delete Project</button>
-    <button onClick =null class="button button2">Archive Project</button>
+    <button onClick ="JavaScript:handleProjectArchiveClick(this)" class="button button2">Archive Project</button>
   </div>
 </div>
 
