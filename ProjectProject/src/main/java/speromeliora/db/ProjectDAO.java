@@ -421,31 +421,28 @@ public class ProjectDAO {
         }
     }
     
-    public Project renameTask(int tid, String name) throws Exception {
+    public Project renameTask(String newName, String identifier, String pid) throws Exception {
     	try {
-            PreparedStatement ps = conn.prepareStatement("SELECT * FROM tasks WHERE tsk_id = ?;");
-            ps.setInt(1, tid);
+            PreparedStatement ps = conn.prepareStatement("SELECT * FROM lookup_table WHERE pid = ? && tmt_id IS NULL;");
+            ps.setString(1, pid);
             ResultSet resultSet = ps.executeQuery();
-            if(!resultSet.next()) {
-            	throw new Exception("Failed to rename task: " + "Unable to find task");
+            while(resultSet.next()) {
+            	ps = conn.prepareStatement("SELECT * FROM tasks WHERE tsk_id = ?;");
+            	ps.setInt(1, resultSet.getInt("tsk_id"));
+            	ResultSet resultSet1 = ps.executeQuery();
+            	if(!resultSet1.next()) {
+            		throw new Exception("Failed to rename task: " + "failed to find task");
+            	}
+            	if(resultSet1.getString("tsk_identifier").equals(identifier)) {
+            		logger.log("found task to update");
+            		ps = conn.prepareStatement("UPDATE tasks SET tsk_name = ? WHERE tsk_id = ?;");
+            		ps.setNString(1, newName);
+            		ps.setInt(2, resultSet.getInt("tsk_id"));
+            		ps.execute();
+            	}
             }
-            logger.log("task found");
-            ps =conn.prepareStatement("UPDATE tasks SET tsk_name = ? WHERE tsk_id = ?");
-            ps.setString(1, name);
-            ps.setInt(2, tid);
-            ps.execute();
             logger.log("task updated");
-            ps = conn.prepareStatement("SELECT * FROM lookup_table WHERE tsk_id = ?;");
-            ps.setInt(1, tid);
-            resultSet = ps.executeQuery();
-            if(!resultSet.next()) {
-            	throw new Exception("Failed to rename task: " + "could not find task in lookup table");
-            }
-            String pid = resultSet.getString("pid");
-            logger.log("returning project " + pid) ;
-            Project updatedProject = getProject(pid);
-            return updatedProject;
-            //bros before hoes except without clothes
+            return getProject(pid);
             
             
         } catch (Exception e) {
