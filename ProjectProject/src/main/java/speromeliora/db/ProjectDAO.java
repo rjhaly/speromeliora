@@ -2,6 +2,7 @@ package speromeliora.db;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,27 @@ public class ProjectDAO {
     		e.printStackTrace();
     		conn = null;
     	}
+    }
+    
+    public int findTaskID(String pid, String identifier) throws Exception{
+    	PreparedStatement ps = conn.prepareStatement("SELECT * FROM lookup_table WHERE pid = ?;");
+    	ps.setNString(1, pid);
+    	ResultSet resultSet = ps.executeQuery();
+    	int tid = -1;
+    	while(resultSet.next()) {
+    		int currentTid = resultSet.getInt("tsk_id");
+    		ps = conn.prepareStatement("SELECT * FROM tasks WHERE tsk_id = ?;");
+    		ps.setInt(1, currentTid);
+    		ResultSet resultSet1 = ps.executeQuery();
+    		if(resultSet1.next()) {
+    		if(resultSet1.getString("tsk_identifier").equals(identifier)) {
+    			tid = currentTid;
+    		}}
+    	}
+    	if(tid == -1) {
+    		throw new Exception("Failed to find task in project with specified identifier");
+    	}
+    	return tid;
     }
 
     public boolean createProject(String pid) throws Exception {
@@ -456,6 +478,56 @@ public class ProjectDAO {
         } catch (Exception e) {
         	logger.log("exception thrown");
             throw new Exception("Failed to rename task: " + e.getMessage());
+        }
+    }
+    
+    public Project allocateTeammate(String pid, String tid, String identifier) throws Exception {
+    	try {
+    		PreparedStatement ps = conn.prepareStatement("SELECT * FROM lookup_table WHERE pid = ? && tmt_id = ?;");
+    		ps.setNString(1, pid);
+    		ps.setNString(2, tid);
+    		ResultSet resultSet = ps.executeQuery();
+    		if(!resultSet.next()) {
+    			throw new Exception("Failed to allocate teammate: teammate not added to specified project");
+    		}
+    		
+    		ps = conn.prepareStatement("SELECT * FROM projects WHERE pid = ?;");
+    		ps.setNString(1, pid);
+    		resultSet = ps.executeQuery();
+    		if(!resultSet.next()) {
+    			throw new Exception("Failed to allocate teammate: project does not exist");
+    		}
+    		if(resultSet.getBoolean("isArchived")) {
+    			throw new Exception("Failed to allocate teammate: project is archived");
+    		}
+    		logger.log("finding taskID");
+    		int tsk_id = findTaskID(pid, identifier);
+    		logger.log("found taskID");
+    		ps = conn.prepareStatement("SELECT * FROM tasks WHERE tsk_id = ?;");
+    		ps.setInt(1, tsk_id);
+    		resultSet = ps.executeQuery();
+    		if(!resultSet.next()) {
+    			throw new Exception("Failed to allocate teammate: task does not exist");
+    		}
+    		if(!resultSet.getBoolean("isBottomLevel") || resultSet.getBoolean("isComplete")) {
+    			throw new Exception("Failed to allocate teammate: task is not applicable to have a teammate added");
+    		}
+    		
+    		ps = conn.prepareStatement("SELECT * FROM lookup_table WHERE tsk_id = ? && tmt_id = ?;");
+    		ps.setInt(1, tsk_id);
+    		ps.setNString(2, tid);
+    		resultSet = ps.executeQuery();
+    		if(resultSet.next()) {
+    			throw new Exception("Failed to allocate teammate: teammate already allocated to this task");
+    		}
+    		ps = conn.prepareStatement("INSERT INTO lookup_table (tsk_id,tmt_id) values (?,?);");
+    		ps.setInt(1, tsk_id);
+    		ps.setString(2, tid);
+    		ps.execute();
+    		return getProject(pid);
+        } catch (Exception e) {
+        	logger.log("exception thrown");
+            throw new Exception("Failed to allocate teammate: " + e.getMessage());
         }
     }
     }
