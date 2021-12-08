@@ -1,6 +1,4 @@
-
-
-function processAssingTeammateResponse(result) {
+function processDeassingTeammateResponse(result) {
   console.log("res:" + result);
   // Can grab any DIV or SPAN HTML element and can then manipulate its contents dynamically via javascript
   var js = JSON.parse(result);
@@ -22,11 +20,11 @@ function processAssingTeammateResponse(result) {
 	cons.innerHTML = "<p>Console Message Display</p>";
   } else if (js["statusCode"] == 400) {
 	output = js["error"];
-	cons.innerHTML = "Unable to assign Teammate";
+	cons.innerHTML = "Unable to deassign Teammate";
   }
   
 }
-function handleAssingTeammateClick(e) {
+function handleDeassingTeammateClick(e) {
   var TaskallocationForm = document.TaskallocationForm;
  
   var data = {};
@@ -38,7 +36,7 @@ function handleAssingTeammateClick(e) {
   var js = JSON.stringify(data);
   console.log("JS:" + js);
   var xhr = new XMLHttpRequest();
-  xhr.open("POST", assignTeammate_url, true);
+  xhr.open("POST", deassignTeammate_url, true);
 
   // send the collected data as JSON
   xhr.send(js);
@@ -50,7 +48,7 @@ function handleAssingTeammateClick(e) {
     if (xhr.readyState == XMLHttpRequest.DONE) {
     	 if (xhr.status == 200) {
 	      console.log ("XHR:" + xhr.responseText);
-	      processAssingTeammateResponse(xhr.responseText);
+	      processDeassingTeammateResponse(xhr.responseText);
     	 } else {
     		 console.log("actual:" + xhr.responseText)
 			  var js = JSON.parse(xhr.responseText);
@@ -58,7 +56,7 @@ function handleAssingTeammateClick(e) {
 			  alert (err);
     	 }
     } else {
-      processAssingTeammateResponse("N/A");
+      processDeassingTeammateResponse("N/A");
     }
   };
 }

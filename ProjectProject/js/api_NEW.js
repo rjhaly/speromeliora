@@ -12,6 +12,7 @@ var addTasks_url       = base_url + "taskAddition";
 var renameTask_url	   = base_url + "taskRename";
 var archive_url		   = base_url + "projectArchival";
 var assignTeammate_url = base_url + "teammateAllocation";
+var deassignTeammate_url = base_url + "teammateDeallocation";
 
 //so the change show up//
 

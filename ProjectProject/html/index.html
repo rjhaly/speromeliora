@@ -13,6 +13,7 @@
 <script type='text/javascript' src='../js/renameTask.js'></script>
 <script type='text/javascript' src='../js/markTask.js'></script>
 <script type='text/javascript' src='../js/assignteammate.js'></script>
+<script type='text/javascript' src='../js/deassignteammate.js'></script>
 
 
 
@@ -105,7 +106,7 @@ p  {text-align: center;}
 <form name="TaskallocationForm" method="post">
 <p>Task Identifier: <input name="task"/> Teammate name:<input name="teammatename"/>
   <input type="button" id="assignteammate" value="Assign Teammate" onClick="JavaScript:handleAssingTeammateClick(this)"/>
-  <input type="button" id="deassignteammate" value="Deassign Teammate" onClick=none/>
+  <input type="button" id="deassignteammate" value="Deassign Teammate" onClick="JavaScript:handleDeassingTeammateClick(this)"/>
 </p>
 </form>
 
