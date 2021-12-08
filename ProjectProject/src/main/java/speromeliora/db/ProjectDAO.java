@@ -136,6 +136,7 @@ public class ProjectDAO {
             throw new Exception("Unable to retrieve Project: " + e.getMessage());
         }
     }
+    
     public Project archiveProject(String pid) throws Exception {
         try {
             PreparedStatement ps = conn.prepareStatement("SELECT * FROM projects WHERE pid = ?;");
@@ -410,6 +411,7 @@ public class ProjectDAO {
             throw new Exception("Unable to add Teammate: " + e.getMessage());
         }
     }
+    
     public Project removeTeammate(String pid, String teammateName) throws Exception {
         try {
             PreparedStatement ps = conn.prepareStatement("DELETE FROM lookup_table WHERE pid = ? && tmt_id = ?;");
@@ -539,7 +541,55 @@ public class ProjectDAO {
     	ps.setNString(2, tmt_id);
     	ps.execute();
     	return getProject(pid);
-		
-		}
+	}
+    
+    public Task getTask(String pid, String identifier) throws Exception {
+    	try {
+    		int task_id = findTaskID(pid, identifier);
+    		
+            PreparedStatement ps = conn.prepareStatement("SELECT * FROM tasks WHERE tsk_id = ?;");
+            ps.setInt(1, task_id);
+            ResultSet resultSet = ps.executeQuery();
+            
+            if(!resultSet.next()) {
+                resultSet.close();
+                logger.log("No task with project " + pid + " and identifier " + identifier);
+                return null;
+            } else {
+            	int tsk_id = task_id;
+            	boolean isComplete = resultSet.getBoolean("isComplete");
+            	boolean isBottomLevel = resultSet.getBoolean("isBottomLevel");
+            	ArrayList<String> subTasks = new ArrayList<>();
+            	ArrayList<String> teammates = new ArrayList<>();
+            	String name = resultSet.getString("tsk_name");
+            	String tsk_identifier = resultSet.getNString("tsk_identifier");
+
+        		// start building subTasks list
+            	ps = conn.prepareStatement("SELECT * FROM tasks WHERE parent_tsk_id = ?;");
+            	ps.setInt(1, tsk_id);
+            	resultSet = ps.executeQuery();
+            	
+            	while(resultSet.next()) {
+            		logger.log("found value in tasks table");
+            		subTasks.add(resultSet.getNString("tsk_name"));
+            	}
+            	
+            	// start building teammates list
+            	ps = conn.prepareStatement("SELECT * FROM lookup_table WHERE pid IS NULL && tsk_id = ?;");
+            	ps.setInt(1, tsk_id);
+            	resultSet = ps.executeQuery();
+            	
+            	while (resultSet.next()) {
+            		logger.log("found value in lookup_table");
+            		teammates.add(resultSet.getNString("tmt_id"));
+            	}
+            	
+            	Task task = new Task(tsk_id, isComplete, isBottomLevel, subTasks, name, tsk_identifier, teammates);
+            	return task;
+            }
+        } catch (Exception e) {
+            throw new Exception("Unable to retrieve task: " + e.getMessage());
+        }
+    }
     
 }

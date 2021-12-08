@@ -7,7 +7,7 @@ public class DeleteProjectRequest {
 	public void setArg1(String arg1) { this.arg1 = arg1; }
 
 	public String toString() {
-		return "ArchiveProject(" + arg1 + ")";
+		return "DeleteProject(" + arg1 + ")";
 	}
 	
 	public DeleteProjectRequest (String arg1) {
