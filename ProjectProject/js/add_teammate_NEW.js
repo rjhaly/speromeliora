@@ -22,7 +22,7 @@ function processAddTeammateResponse(result) {
 	cons.innerHTML = "<p>Console Message Display</p>";
   } else if (js["statusCode"] == 400) {
 	output = js["error"];
-	cons.innerHTML = output;
+	cons.innerHTML = "Unable to add teammate to project";
   }
   
 }

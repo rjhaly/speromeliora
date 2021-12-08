@@ -2,6 +2,7 @@ package speromeliora.db;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,27 @@ public class ProjectDAO {
     		e.printStackTrace();
     		conn = null;
     	}
+    }
+    
+    public int findTaskID(String pid, String identifier) throws Exception{
+    	PreparedStatement ps = conn.prepareStatement("SELECT * FROM lookup_table WHERE pid = ?;");
+    	ps.setNString(1, pid);
+    	ResultSet resultSet = ps.executeQuery();
+    	int tid = -1;
+    	while(resultSet.next()) {
+    		int currentTid = resultSet.getInt("tsk_id");
+    		ps = conn.prepareStatement("SELECT * FROM tasks WHERE tsk_id = ?;");
+    		ps.setInt(1, currentTid);
+    		ResultSet resultSet1 = ps.executeQuery();
+    		if(resultSet1.next()) {
+    		if(resultSet1.getString("tsk_identifier").equals(identifier)) {
+    			tid = currentTid;
+    		}}
+    	}
+    	if(tid == -1) {
+    		throw new Exception("Failed to find task in project with specified identifier");
+    	}
+    	return tid;
     }
 
     public boolean createProject(String pid) throws Exception {
@@ -82,8 +104,24 @@ public class ProjectDAO {
             			ResultSet resultSet1 = ps1.executeQuery();
             			logger.log("" + resultSet1.next());
             			attribute = resultSet1.getNString("tsk_name");
-            			tasks.add(attribute);
-            			identifiers.add(resultSet1.getNString("tsk_identifier"));
+            			if(identifiers.size() == 0) {
+            				tasks.add(attribute);
+            				identifiers.add(resultSet1.getNString("tsk_identifier"));
+            			}
+            			else {
+            			for(int i = 0; i < identifiers.size(); i++) {
+            				if(resultSet1.getNString("tsk_identifier").compareTo(identifiers.get(i)) < 0) {
+            					tasks.add(i,attribute);
+            					identifiers.add(i,resultSet1.getNString("tsk_identifier"));
+            					break;
+            				}
+            				else if(i == identifiers.size() - 1) {
+            					tasks.add(i + 1,attribute);
+            					identifiers.add(i + 1,resultSet1.getNString("tsk_identifier"));
+            					break;
+            				}            				
+            			}
+            			}
             		}
             		else {
             			attribute = resultSet.getNString("tmt_id");
@@ -98,7 +136,7 @@ public class ProjectDAO {
             throw new Exception("Unable to retrieve Project: " + e.getMessage());
         }
     }
-    public void archiveProject(String pid) throws Exception {
+    public Project archiveProject(String pid) throws Exception {
         try {
             PreparedStatement ps = conn.prepareStatement("SELECT * FROM projects WHERE pid = ?;");
             ps.setString(1, pid);
@@ -110,6 +148,7 @@ public class ProjectDAO {
             ps =conn.prepareStatement("UPDATE projects SET isArchived = true WHERE pid = ?");
             ps.setNString(1, pid);
             ps.execute();
+            return getProject(pid);
         } catch (Exception e) {
         	logger.log("exception thrown");
             throw new Exception("Failed to archive project: " + "project ID does not exist");
@@ -181,7 +220,7 @@ public class ProjectDAO {
         	ResultSet resultSet = ps.executeQuery();
         	
         	if(!resultSet.next()) {
-        		throw new Exception("Fai	led to add task: could not find project");
+        		throw new Exception("Failed to add task: could not find project");
         	}	
         	for(int i = 0; i < tasks.length; i++) {
         		logger.log("creating a new task");
@@ -199,22 +238,18 @@ public class ProjectDAO {
         		if(parentTaskIdentifier != "") {
         			logger.log("creating task with parent");
         			PreparedStatement ps1 = conn.prepareStatement("SELECT * FROM tasks WHERE tsk_identifier = ?;");
-        			ps1.setNString(1, parentTaskIdentifier);
+        			ps1.setString(1, parentTaskIdentifier);
         			ResultSet resultSet1 = ps1.executeQuery();
-        			if(!resultSet1.next()) {
-        				throw new Exception("Failed to add task: Parent task identifier not found");
-        			}
         			ArrayList<Integer> taskIDs = new ArrayList<>();
-        			logger.log("before first do");
-        			do {
-        				int taskID = resultSet1.getInt("tsk_id");
-        				taskIDs.add(taskID);
-        			}while(resultSet.next());
-        			logger.log("after first do");
+        			while(resultSet1.next()) {
+        				logger.log("Looking at task: " + resultSet1.getNString("tsk_name"));
+        				taskIDs.add(resultSet1.getInt("tsk_id"));
+        			}
         			boolean taskFound = false;
         			int foundTaskID = -1;
         			String foundIdentifier = "";
-        			for(int j = 0; i < taskIDs.size(); i++) {
+        			for(int j = 0; j < taskIDs.size(); j++) {
+        				logger.log("" + taskIDs.get(j));
         				ps1 = conn.prepareStatement("SELECT * FROM lookup_table WHERE tsk_id = ?;");
         				ps1.setInt(1, taskIDs.get(j));
         				resultSet1 = ps1.executeQuery();
@@ -222,12 +257,14 @@ public class ProjectDAO {
         				if(!resultSet1.next()) {
             			}
         				else {
+        					logger.log("checking project against current project: " + resultSet1.getString("pid"));
         					if(resultSet1.getString("pid").equals(pid)) {
         						taskFound = true;
         						foundTaskID = taskIDs.get(j);
         					}
         				}
         			}
+        			logger.log("outside j loop");
         			if(!taskFound) {
         				throw new Exception("Failed to add task: Parent task ID not associated with this project");
         			}
@@ -238,11 +275,14 @@ public class ProjectDAO {
         			foundIdentifier = resultSet1.getString("tsk_identifier");
         			
         			ps.setInt(2, foundTaskID);
-        			ps1 = conn.prepareStatement("SELECT * FROM tasks WHERE parent_tsk_id = ?;");
+        			ps1 = conn.prepareStatement("SELECT * FROM tasks WHERE parent_tsk_id = ?;",
+                            ResultSet.TYPE_SCROLL_SENSITIVE, 
+                        ResultSet.CONCUR_UPDATABLE);
         			ps1.setInt(1, foundTaskID);
         			resultSet1 = ps1.executeQuery();
         			
         			if(!resultSet1.next()) {
+        				logger.log("in base case");
         				String newIdent = foundIdentifier + "." + 1;
         				ps.setNString(3, newIdent);
         			}
@@ -251,15 +291,21 @@ public class ProjectDAO {
         				String lastIdent = resultSet1.getString("tsk_identifier");
         				String lastNum = lastIdent.substring(lastIdent.length() - 1);
         				int num = Integer.parseInt(lastNum);
-        				int newNum = num++;
+        				logger.log("new task identifier last number: " + num + "plus 1");
+        				int newNum = num + 1;
         				String newIdent = foundIdentifier + "." + newNum;
         				ps.setNString(3, newIdent);
+        			}
+        			if(foundTaskID != -1) {
+        				ps1 = conn.prepareStatement("UPDATE tasks SET isBottomLevel = false WHERE tsk_id = ?;");
+        				ps1.setInt(1, foundTaskID);
+        				ps1.execute();
         			}
         		}
         		else {
         			logger.log("creating task without parent");
         			ps.setNString(2, null);
-        			PreparedStatement ps2 = conn.prepareStatement("SELECT * FROM lookup_table WHERE pid = ?;",
+        			PreparedStatement ps2 = conn.prepareStatement("SELECT * FROM lookup_table WHERE pid = ? && tmt_id IS NULL;",
                             ResultSet.TYPE_SCROLL_SENSITIVE, 
                         ResultSet.CONCUR_UPDATABLE);
         			ps2.setNString(1, pid);
@@ -270,22 +316,30 @@ public class ProjectDAO {
             			task.setTaskIdentifier("1");
         			}
         			else {
-        			logger.log("before last");
-        			resultSet2.last();
-        			logger.log("after last");
-        			String lastTskID = resultSet2.getString("tsk_id");
-        			logger.log("found task: " + lastTskID);
-        			ps2 = conn.prepareStatement("SELECT * FROM tasks WHERE tsk_id = ?;");
-        			ps2.setNString(1, lastTskID);
-        			resultSet2 = ps2.executeQuery();
-        			resultSet2.next();
-        			String lastIdent = resultSet2.getString("tsk_identifier");
-        			logger.log("last identifier:" + lastIdent +"");
-        			int identNum = Integer.parseInt(lastIdent); 
-        			int newIdent = identNum + 1;
-        			String newIdentifier = String.valueOf(newIdent);
-        			ps.setNString(3, newIdentifier);
-        			task.setTaskIdentifier(newIdentifier);
+        				int max = -1;
+        				PreparedStatement ps3 = conn.prepareStatement("SELECT * FROM tasks WHERE tsk_id = ?;");
+    					ps3.setInt(1, resultSet2.getInt("tsk_id"));
+    					logger.log("passed initial resultset2 call");
+    					ResultSet resultSet3 = ps3.executeQuery();
+    					if(resultSet3.next()) {
+        				if(resultSet3.getString("tsk_identifier").length() == 1) {
+        					max = Integer.parseInt(resultSet3.getString("tsk_identifier"));
+        				}
+        				while(resultSet2.next()) {
+        					ps3 = conn.prepareStatement("SELECT * FROM tasks WHERE tsk_id = ?;");
+        					ps3.setInt(1, resultSet2.getInt("tsk_id"));
+        					resultSet3 = ps3.executeQuery();
+        					if(resultSet3.next()) {
+        						if(resultSet3.getString("tsk_identifier").length() == 1) {
+        							int newNum = Integer.parseInt(resultSet3.getString("tsk_identifier"));
+        							if(newNum > max) {
+        								max = newNum;
+        							}
+                				}
+        					}
+        				}
+    					}
+        				ps.setString(3, "" + (max + 1));
         		}}
 	            ps.execute();
 	            logger.log("added task to db");
@@ -304,6 +358,7 @@ public class ProjectDAO {
 	            ps.execute();
 	            logger.log("finished creating new task");
         	}
+        	
         	return getProject(pid);
         } catch (Exception e) {
             throw new Exception("Failed to add task: " + e.getMessage());
@@ -396,31 +451,28 @@ public class ProjectDAO {
         }
     }
     
-    public Project renameTask(int tid, String name) throws Exception {
+    public Project renameTask(String newName, String identifier, String pid) throws Exception {
     	try {
-            PreparedStatement ps = conn.prepareStatement("SELECT * FROM tasks WHERE tsk_id = ?;");
-            ps.setInt(1, tid);
+            PreparedStatement ps = conn.prepareStatement("SELECT * FROM lookup_table WHERE pid = ? && tmt_id IS NULL;");
+            ps.setString(1, pid);
             ResultSet resultSet = ps.executeQuery();
-            if(!resultSet.next()) {
-            	throw new Exception("Failed to rename task: " + "Unable to find task");
+            while(resultSet.next()) {
+            	ps = conn.prepareStatement("SELECT * FROM tasks WHERE tsk_id = ?;");
+            	ps.setInt(1, resultSet.getInt("tsk_id"));
+            	ResultSet resultSet1 = ps.executeQuery();
+            	if(!resultSet1.next()) {
+            		throw new Exception("Failed to rename task: " + "failed to find task");
+            	}
+            	if(resultSet1.getString("tsk_identifier").equals(identifier)) {
+            		logger.log("found task to update");
+            		ps = conn.prepareStatement("UPDATE tasks SET tsk_name = ? WHERE tsk_id = ?;");
+            		ps.setNString(1, newName);
+            		ps.setInt(2, resultSet.getInt("tsk_id"));
+            		ps.execute();
+            	}
             }
-            logger.log("task found");
-            ps =conn.prepareStatement("UPDATE tasks SET tsk_name = ? WHERE tsk_id = ?");
-            ps.setString(1, name);
-            ps.setInt(2, tid);
-            ps.execute();
             logger.log("task updated");
-            ps = conn.prepareStatement("SELECT * FROM lookup_table WHERE tsk_id = ?;");
-            ps.setInt(1, tid);
-            resultSet = ps.executeQuery();
-            if(!resultSet.next()) {
-            	throw new Exception("Failed to rename task: " + "could not find task in lookup table");
-            }
-            String pid = resultSet.getString("pid");
-            logger.log("returning project " + pid) ;
-            Project updatedProject = getProject(pid);
-            return updatedProject;
-            //bros before hoes except without clothes
+            return getProject(pid);
             
             
         } catch (Exception e) {
@@ -428,4 +480,66 @@ public class ProjectDAO {
             throw new Exception("Failed to rename task: " + e.getMessage());
         }
     }
+    
+    public Project allocateTeammate(String pid, String tid, String identifier) throws Exception {
+    	try {
+    		PreparedStatement ps = conn.prepareStatement("SELECT * FROM lookup_table WHERE pid = ? && tmt_id = ?;");
+    		ps.setNString(1, pid);
+    		ps.setNString(2, tid);
+    		ResultSet resultSet = ps.executeQuery();
+    		if(!resultSet.next()) {
+    			throw new Exception("Failed to allocate teammate: teammate not added to specified project");
+    		}
+    		
+    		ps = conn.prepareStatement("SELECT * FROM projects WHERE pid = ?;");
+    		ps.setNString(1, pid);
+    		resultSet = ps.executeQuery();
+    		if(!resultSet.next()) {
+    			throw new Exception("Failed to allocate teammate: project does not exist");
+    		}
+    		if(resultSet.getBoolean("isArchived")) {
+    			throw new Exception("Failed to allocate teammate: project is archived");
+    		}
+    		logger.log("finding taskID");
+    		int tsk_id = findTaskID(pid, identifier);
+    		logger.log("found taskID");
+    		ps = conn.prepareStatement("SELECT * FROM tasks WHERE tsk_id = ?;");
+    		ps.setInt(1, tsk_id);
+    		resultSet = ps.executeQuery();
+    		if(!resultSet.next()) {
+    			throw new Exception("Failed to allocate teammate: task does not exist");
+    		}
+    		if(!resultSet.getBoolean("isBottomLevel") || resultSet.getBoolean("isComplete")) {
+    			throw new Exception("Failed to allocate teammate: task is not applicable to have a teammate added");
+    		}
+    		
+    		ps = conn.prepareStatement("SELECT * FROM lookup_table WHERE tsk_id = ? && tmt_id = ?;");
+    		ps.setInt(1, tsk_id);
+    		ps.setNString(2, tid);
+    		resultSet = ps.executeQuery();
+    		if(resultSet.next()) {
+    			throw new Exception("Failed to allocate teammate: teammate already allocated to this task");
+    		}
+    		ps = conn.prepareStatement("INSERT INTO lookup_table (tsk_id,tmt_id) values (?,?);");
+    		ps.setInt(1, tsk_id);
+    		ps.setString(2, tid);
+    		ps.execute();
+    		return getProject(pid);
+        } catch (Exception e) {
+        	logger.log("exception thrown");
+            throw new Exception("Failed to allocate teammate: " + e.getMessage());
+        }
     }
+    
+    public Project deallocateTeammate(String pid, String tmt_id, String identifier) throws Exception {
+    	int tsk_id = findTaskID(pid, identifier);
+    	
+    	PreparedStatement ps = conn.prepareStatement("DELETE FROM lookup_table WHERE tsk_id = ? && tmt_id = ?;");
+    	ps.setInt(1, tsk_id);
+    	ps.setNString(2, tmt_id);
+    	ps.execute();
+    	return getProject(pid);
+		
+		}
+    
+}

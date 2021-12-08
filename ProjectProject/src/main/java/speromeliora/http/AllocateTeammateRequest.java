@@ -1,6 +1,6 @@
 package speromeliora.http;
 
-public class RenameTaskRequest {
+public class AllocateTeammateRequest {
 	String arg1, arg2, arg3;
 	
 	public String getArg1() { return arg1; }
@@ -14,12 +14,12 @@ public class RenameTaskRequest {
 		return "Rename Task(" + arg1 + ")";
 	}
 	
-	public RenameTaskRequest (String arg1, String arg2, String arg3) {
+	public AllocateTeammateRequest (String arg1, String arg2, String arg3) {
 		this.arg1 = arg1;
 		this.arg2 = arg2;
 		this.arg3 = arg3;
 	}
 	
-	public RenameTaskRequest() {
+	public AllocateTeammateRequest() {
 	}
 }

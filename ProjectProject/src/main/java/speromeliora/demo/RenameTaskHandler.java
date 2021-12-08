@@ -34,18 +34,20 @@ public class RenameTaskHandler implements RequestHandler<RenameTaskRequest, Rena
 		boolean fail = false;
 		String failMessage = "";
 		Project updatedProject = new Project();
-		int tid = -1;
-		String name = "";
+		String newName = "";
+		String identifier = "";
+		String pid = "";
 		try {
-			tid = req.getArg1();
-			name = req.getArg2();
+			newName = req.getArg1();
+			identifier = req.getArg2();
+			pid = req.getArg3();
 		} catch (NumberFormatException e) {
 			failMessage = "Unable to parse parameters";
 			fail = true;
 		}
-		if (tid != -1 && name != "") {
+		if (newName != "" && identifier != "" && pid != "") {
 			try {
-				updatedProject = renameTaskInRDS(tid, name);
+				updatedProject = renameTaskInRDS(newName, identifier, pid);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -66,11 +68,11 @@ public class RenameTaskHandler implements RequestHandler<RenameTaskRequest, Rena
 		return response; 
 	}
     
-    public Project renameTaskInRDS(int tid, String name) throws Exception {
+    public Project renameTaskInRDS(String newName, String identifier, String pid) throws Exception {
 		if (logger != null) { logger.log("in renameTask"); }
 		ProjectDAO dao = new ProjectDAO(logger);
 		if (logger != null) { logger.log("retrieved DAO"); }
-		Project project = dao.renameTask(tid, name);
+		Project project = dao.renameTask(newName, identifier, pid);
 		if (logger != null) { logger.log("renamedTask"); }
 		return project;
 	}
