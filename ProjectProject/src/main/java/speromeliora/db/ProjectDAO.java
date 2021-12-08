@@ -530,4 +530,16 @@ public class ProjectDAO {
             throw new Exception("Failed to allocate teammate: " + e.getMessage());
         }
     }
-    }
+    
+    public Project deallocateTeammate(String pid, String tmt_id, String identifier) throws Exception {
+    	int tsk_id = findTaskID(pid, identifier);
+    	
+    	PreparedStatement ps = conn.prepareStatement("DELETE FROM lookup_table WHERE tsk_id = ? && tmt_id = ?;");
+    	ps.setInt(1, tsk_id);
+    	ps.setNString(2, tmt_id);
+    	ps.execute();
+    	return getProject(pid);
+		
+		}
+    
+}
