@@ -3,7 +3,7 @@
 <head>
 
 <!-- relative path-name to access js -->
-<script type='text/javascript' src='../js/api.js'></script>
+<script type='text/javascript' src='../js/api_NEW.js'></script>
 <script type='text/javascript' src='../js/get_project_NEW.js'></script>
 <script type='text/javascript' src='../js/create.js'></script>
 <script type='text/javascript' src='../js/deleteNew.js'></script>
@@ -12,6 +12,9 @@
 <script type='text/javascript' src='../js/add_tasks.js'></script>
 <script type='text/javascript' src='../js/renameTask.js'></script>
 <script type='text/javascript' src='../js/markTask.js'></script>
+<script type='text/javascript' src='../js/assignteammate.js'></script>
+<script type='text/javascript' src='../js/deassignteammate.js'></script>
+
 
 
 <meta charset="UTF-8">
@@ -77,12 +80,16 @@ p  {text-align: center;}
 </p>
 </form>
 
+<h2>Teammate Management</h2>
+
 <form name="teammateForm" method="post">
 <p>Teammate name: <input name="addTeammateName"/>
    <input type="button" id="addTeammateButton" value="Add Teammate" onClick="JavaScript:handleAddTeammateClick(this)"/>
    <input type = "button" id="removeTeammateButton" value="Remove Teammate" onClick="JavaScript:handleRemoveTeammateClick(this)"/>
 </p>
 </form>
+
+<h2>Task Management</h2>
 
 <form name="addTasksForm" method="post">
 <p>Task names: <input name="addTasksName" value=""/> Parent Task Identifier: <input name="addTasksID" value=""/>
@@ -93,6 +100,13 @@ p  {text-align: center;}
 <form name="renameTaskForm" method="post">
 <p>Task Identifier: <input name="renameTaskID"/> Rename to: <input name="renameTaskName"/>
   <input type="button" id="renameTaskButton" value="Rename Task" onClick="JavaScript:handleRenameTaskClick(this)"/>
+</p>
+</form>
+
+<form name="TaskallocationForm" method="post">
+<p>Task Identifier: <input name="task"/> Teammate name:<input name="teammatename"/>
+  <input type="button" id="assignteammate" value="Assign Teammate" onClick="JavaScript:handleAssingTeammateClick(this)"/>
+  <input type="button" id="deassignteammate" value="Deassign Teammate" onClick="JavaScript:handleDeassingTeammateClick(this)"/>
 </p>
 </form>
 
