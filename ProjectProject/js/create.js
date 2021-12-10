@@ -4,19 +4,43 @@ function processCreateResponse(result) {
   console.log("project name:" + result);
 
   var js = JSON.parse(result);
+  var proj = document.getElementById("getProjectDisplay");
   var cons = document.getElementById("consoleMessageDisplay");
+  var workingProject = document.getElementById("workingProject");
 
   var output = "";
   var status = js["statusCode"];
   if (status === 200) {
-	status = "<p>Project successfully created.</p>";
+	// Project Output
+	output = "<p>" + "Project Name: " + js["project"]["pid"] + "<br>";
+	
+	const tsk_ids = js["project"]["identifiers"];
+	const tsk_names = js["project"]["tasks"];
+	
+	output += "</p><div class=\"left\">";
+	for (let i = 0; i < tsk_ids.length; i++) {
+		const id = tsk_ids[i];
+		const name = tsk_names[i];
+		// count # of . for tabs
+		for (let j = 0; j < id.length; j++)
+			if (id.charAt(j) == '.')
+				output += "\t";
+		output += "<input type=\"checkbox\" id=\"checkbox" + id + "\" onclick=\"JavaScript:handleMarkTaskClick(this, " + id + ")\">" + id + ": " + name + "<br>";
+	}
+	output += "</div><p>";
+	
+	output +="teammates: " 	  + js["project"]["teammates"] 	+ "<br>" +
+			 "isArchived: "   + js["project"]["isArchived"] + "</p>";
+	// Update Displays
+	workingProject.innerHTML = result;
+  	cons.innerHTML = "<p>Project successfully created.</p>";
+	proj.innerHTML = output;
   } else if (status === 400) {
-	status = "<p>Project failed to create.</p>";
+  	cons.innerHTML = "<p>Project failed to create.</p>";
   }
 
   console.log(status);
 
-  cons.innerHTML = status;
 }
 function handleCreateClick(e) {
   var form = document.createForm;

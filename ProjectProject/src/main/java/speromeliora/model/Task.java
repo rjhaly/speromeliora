@@ -3,17 +3,17 @@ package speromeliora.model;
 import java.util.ArrayList;
 
 public class Task {
-	
+
 	int tsk_id;
-	boolean isCompleted;
-	boolean isBottomLevel;
-	ArrayList<String> subTasks;
 	String name;
 	String identifier;
+	ArrayList<String> subTasks;
 	ArrayList<String> teammates;
+	boolean isCompleted;
+	boolean isBottomLevel;
 	
-	public Task(int taskID, boolean completed, boolean bottomLevel, ArrayList<String> newSubTasks, String taskName, String taskIdentifier, ArrayList<String> newTeammates) {
-		tsk_id = taskID;
+	public Task(int tid, boolean completed, boolean bottomLevel, ArrayList<String> newSubTasks, String taskName, String taskIdentifier, ArrayList<String> newTeammates) {
+		tsk_id = tid;
 		isCompleted = completed;
 		isBottomLevel = bottomLevel;
 		subTasks = newSubTasks;
@@ -39,4 +39,10 @@ public class Task {
 	public void setIsBottomLevel(boolean bottomLevel) { isBottomLevel = bottomLevel; }
 	public void setSubTasks(ArrayList<String> taskSubTasks) { subTasks = taskSubTasks; }
 	public void setTeammates(ArrayList<String> taskTeammates) { teammates = taskTeammates; }
+	
+	@Override
+	public String toString() {
+		return identifier + " " + name;
+	}
+	
 }

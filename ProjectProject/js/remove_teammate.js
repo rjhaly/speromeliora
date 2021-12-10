@@ -11,11 +11,25 @@ function processRemoveTeammateResponse(result) {
   var output = "";
 
   if(js["statusCode"] == 200) {
-	output = "<p>" +
-			 "Project Name: " + js["project"]["pid"] 		+ "<br>" +
-			 "tasks: " 		  + js["project"]["tasks"] 		+ "<br>" +
-			 "task identifiers: " + js["project"]["identifiers"] + "<br>" +
-			 "teammates: " 	  + js["project"]["teammates"] 	+ "<br>" +
+	// Project Output
+	output = "<p>" + "Project Name: " + js["project"]["pid"] + "<br>";
+	
+	const tsk_ids = js["project"]["identifiers"];
+	const tsk_names = js["project"]["tasks"];
+	
+	output += "</p><div class=\"left\">";
+	for (let i = 0; i < tsk_ids.length; i++) {
+		const id = tsk_ids[i];
+		const name = tsk_names[i];
+		// count # of . for tabs
+		for (let j = 0; j < id.length; j++)
+			if (id.charAt(j) == '.')
+				output += "\t";
+		output += "<input type=\"checkbox\" id=\"checkbox" + id + "\" onclick=\"JavaScript:handleMarkTaskClick(this, " + id + ")\">" + id + ": " + name + "<br>";
+	}
+	output += "</div><p>";
+	
+	output +="teammates: " 	  + js["project"]["teammates"] 	+ "<br>" +
 			 "isArchived: "   + js["project"]["isArchived"] + "</p>";
 	// Update computation result
 	proj.innerHTML = output;

@@ -4,27 +4,35 @@
  *
  * returns a project
  */
+
+var output;
+
 function processGetResponse(result) {
   console.log("res:" + result);
   // Can grab any DIV or SPAN HTML element and can then manipulate its contents dynamically via javascript
-  var js = JSON.parse(result);
-  var proj = document.getElementById("getProjectDisplay");
-  var cons = document.getElementById("consoleMessageDisplay");
-  var workingProject = document.getElementById("workingProject");
-  var output = "";
+  const js = JSON.parse(result);
+  let proj = document.getElementById("getProjectDisplay");
+  let cons = document.getElementById("consoleMessageDisplay");
+  let workingProject = document.getElementById("workingProject");
 
   if(js["statusCode"] == 200){
-	
+	// Project output
 	output = "<p>" + "Project Name: " + js["project"]["pid"] + "<br>";
 	
 	const tsk_ids = js["project"]["identifiers"];
 	const tsk_names = js["project"]["tasks"];
 	
+	output += "</p><div class=\"left\">";
 	for (let i = 0; i < tsk_ids.length; i++) {
 		const id = tsk_ids[i];
 		const name = tsk_names[i];
+		// count # of . for tabs
+		for (let j = 0; j < id.length; j++)
+			if (id.charAt(j) == '.')
+				output += "\t";
 		output += "<input type=\"checkbox\" id=\"checkbox" + id + "\" onclick=\"JavaScript:handleMarkTaskClick(this, " + id + ")\">" + id + ": " + name + "<br>";
 	}
+	output += "</div><p>";
 	
 	output +="teammates: " 	  + js["project"]["teammates"] 	+ "<br>" +
 			 "isArchived: "   + js["project"]["isArchived"] + "</p>";
@@ -35,6 +43,7 @@ function processGetResponse(result) {
   } else if (js["statusCode"] == 400) {
 	output = "<p>Could not retrieve project</p>";
 	proj.innerHTML = "<p></p>";
+	workingProject.innerHTML = "";
 	cons.innerHTML = output;
   }
 }

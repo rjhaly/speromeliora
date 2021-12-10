@@ -50,7 +50,10 @@ public class ProjectDAO {
     	return tid;
     }
 
-    public boolean createProject(String pid) throws Exception {
+    public Project createProject(String pid) throws Exception {
+    	
+    	Project createdProject = null;
+    	
         try {
             PreparedStatement ps = conn.prepareStatement("SELECT * FROM projects WHERE pid = ?;");
             ps.setString(1, pid);
@@ -67,11 +70,19 @@ public class ProjectDAO {
             ps.setString(1,  pid);
             ps.setBoolean(2,  false);
             ps.execute();
-            return true;
+            
+            ArrayList<String> tasks = new ArrayList<String>();
+            ArrayList<String> teammates = new ArrayList<String>();
+            ArrayList<String> identifiers = new ArrayList<String>();
+            boolean isArchived = false;
+            
+            createdProject = new Project(pid, tasks, teammates, identifiers, isArchived);
 
         } catch (Exception e) {
             throw new Exception("Failed to create project: " + e.getMessage());
         }
+        
+        return createdProject;
     }
     public Project getProject(String pid) throws Exception{
     	try {

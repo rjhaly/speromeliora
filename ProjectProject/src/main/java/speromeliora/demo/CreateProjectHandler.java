@@ -12,6 +12,7 @@ import com.amazonaws.services.s3.model.S3Object;
 import speromeliora.db.ProjectDAO;
 import speromeliora.http.CreateProjectRequest;
 import speromeliora.http.CreateProjectResponse;
+import speromeliora.model.Project;
 
 public class CreateProjectHandler implements RequestHandler<CreateProjectRequest, CreateProjectResponse> {
 
@@ -33,21 +34,18 @@ public class CreateProjectHandler implements RequestHandler<CreateProjectRequest
         // Get the object from the event and show its content type
 		boolean fail = false;
 		String failMessage = "";
-		String pid = "";
-		try {
-			pid = req.getArg1();
-		} catch (NumberFormatException e) {
-			failMessage = "Unable to parse pid";
-			fail = true;
-		}
-		if (pid != "") {
+		String pid = req.getArg1();
+		Project project = null;
+		
+		if (pid.length() > 0) {
 			try {
-				createProjectInRDS(pid);
+				project = createProjectInRDS(pid);
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				fail = true;
 			}
+		} else {
+			fail = true;
 		}
 
 		// compute proper response and return. Note that the status code is internal to the HTTP response
@@ -56,18 +54,20 @@ public class CreateProjectHandler implements RequestHandler<CreateProjectRequest
 		if (fail) {
 			response = new CreateProjectResponse(400, failMessage);
 		} else {
-			response = new CreateProjectResponse(pid, 200);  // success
+			response = new CreateProjectResponse(project, 200);  // success
 		}
 
 		return response; 
 	}
     
-    public void createProjectInRDS(String pid) throws Exception {
+    public Project createProjectInRDS(String pid) throws Exception {
+    	Project project;
 		if (logger != null) { logger.log("in createProject"); }
 		ProjectDAO dao = new ProjectDAO(logger);
 		if (logger != null) { logger.log("retrieved DAO"); }
-		dao.createProject(pid);
+		project = dao.createProject(pid);
 		if (logger != null) { logger.log("created Project"); }
+		return project;
 	}
     
 

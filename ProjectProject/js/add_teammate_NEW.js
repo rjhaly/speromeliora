@@ -3,24 +3,39 @@
 function processAddTeammateResponse(result) {
   console.log("res:" + result);
   // Can grab any DIV or SPAN HTML element and can then manipulate its contents dynamically via javascript
-  var js = JSON.parse(result);
+  const js = JSON.parse(result);
   console.log(js);
-  var proj = document.getElementById("getProjectDisplay");
-  var cons = document.getElementById("consoleMessageDisplay");
-  
-  var output = "";
+  let proj = document.getElementById("getProjectDisplay");
+  let cons = document.getElementById("consoleMessageDisplay");
+
+  let output = "";
 
   if(js["statusCode"] == 200) {
-	output = "<p>" +
-			 "Project Name: " + js["project"]["pid"] 		+ "<br>" +
-			 "tasks: " 		  + js["project"]["tasks"] 		+ "<br>" +
-			 "task identifiers: " + js["project"]["identifiers"] + "<br>" +
-			 "teammates: " 	  + js["project"]["teammates"] 	+ "<br>" +
+	// project output 
+	output = "<p>" + "Project Name: " + js["project"]["pid"] + "<br>";
+	
+	const tsk_ids = js["project"]["identifiers"];
+	const tsk_names = js["project"]["tasks"];
+	
+	output += "</p><div class=\"left\">";
+	for (let i = 0; i < tsk_ids.length; i++) {
+		const id = tsk_ids[i];
+		const name = tsk_names[i];
+		// count # of . for tabs
+		for (let j = 0; j < id.length; j++)
+			if (id.charAt(j) == '.')
+				output += "\t";
+		output += "<input type=\"checkbox\" id=\"checkbox" + id + "\" onclick=\"JavaScript:handleMarkTaskClick(this, " + id + ")\">" + id + ": " + name + "<br>";
+	}
+	output += "</div><p>";
+	
+	output +="teammates: " 	  + js["project"]["teammates"] 	+ "<br>" +
 			 "isArchived: "   + js["project"]["isArchived"] + "</p>";
 	// Update computation result
 	proj.innerHTML = output;
 	cons.innerHTML = "<p>Console Message Display</p>";
   } else if (js["statusCode"] == 400) {
+	// error output
 	output = js["error"];
 	cons.innerHTML = "Unable to add teammate to project";
   }
