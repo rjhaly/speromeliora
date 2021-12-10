@@ -14,8 +14,10 @@ import speromeliora.model.Task;
 import speromeliora.model.Teammate;
 
 public class ProjectDAO {
+	
 	java.sql.Connection conn;
 	LambdaLogger logger;
+	
     public ProjectDAO(LambdaLogger log) {
     	logger = log;
     	logger.log("makingDAO");
@@ -84,8 +86,10 @@ public class ProjectDAO {
         
         return createdProject;
     }
+    
     public Project getProject(String pid) throws Exception{
     	try {
+    		// find project, then reassemble a Project item from database
             PreparedStatement ps = conn.prepareStatement("SELECT * FROM projects WHERE pid = ?;");
             ps.setString(1, pid);
             ResultSet resultSet = ps.executeQuery();
@@ -94,49 +98,36 @@ public class ProjectDAO {
                 resultSet.close();
                 logger.log("No project with name " + pid);
                 return null;
-            }
-            else {
+            } else {
             	String name = pid;
             	ArrayList<String> tasks = new ArrayList<>();
             	ArrayList<String> teammates= new ArrayList<>();
             	ArrayList<String> identifiers = new ArrayList<>();
             	boolean isArchived = resultSet.getBoolean("isArchived");
+            	// find all rows for this project
             	ps = conn.prepareStatement("SELECT * FROM lookup_table WHERE pid = ?;");
             	ps.setString(1, pid);
             	resultSet = ps.executeQuery();
             	
             	while(resultSet.next()) {
-            		logger.log("found value in lookup table");
-            		String attribute;
+            		logger.log("found project row in lookup table");
+            		// check if row contains a task id, if not, look to else for teammates
             		if(resultSet.getString("tsk_id") != null) {
             			logger.log("Looking at task id " + resultSet.getInt("tsk_id"));
             			PreparedStatement ps1 = conn.prepareStatement("SELECT * FROM tasks WHERE tsk_id = ?;");
             			ps1.setInt(1, resultSet.getInt("tsk_id"));
-            			ResultSet resultSet1 = ps1.executeQuery();
-            			logger.log("" + resultSet1.next());
-            			attribute = resultSet1.getNString("tsk_name");
-            			if(identifiers.size() == 0) {
-            				tasks.add(attribute);
-            				identifiers.add(resultSet1.getNString("tsk_identifier"));
-            			}
-            			else {
-            			for(int i = 0; i < identifiers.size(); i++) {
-            				if(resultSet1.getNString("tsk_identifier").compareTo(identifiers.get(i)) < 0) {
-            					tasks.add(i,attribute);
-            					identifiers.add(i,resultSet1.getNString("tsk_identifier"));
-            					break;
-            				}
-            				else if(i == identifiers.size() - 1) {
-            					tasks.add(i + 1,attribute);
-            					identifiers.add(i + 1,resultSet1.getNString("tsk_identifier"));
-            					break;
-            				}            				
-            			}
-            			}
-            		}
-            		else {
-            			attribute = resultSet.getNString("tmt_id");
-            			teammates.add(attribute);
+            			ResultSet taskRow = ps1.executeQuery();
+            			logger.log("" + taskRow.next());
+            			// insert tasks ordered by identifier
+            			String taskIdentifier = taskRow.getNString("tsk_identifier");
+            			String taskName = taskRow.getNString("tsk_name");
+            			int i = 0;
+            			while (i < identifiers.size() && taskIdentifier.compareTo(identifiers.get(i)) > 0) i++;
+            			identifiers.add(i, taskIdentifier);
+            			tasks.add(i, taskName);
+            		} else {
+            			String teammateName = resultSet.getNString("tmt_id");
+            			teammates.add(teammateName);
             		}
             	}
             	Project project = new Project(name, tasks, teammates, identifiers, isArchived);
@@ -208,8 +199,7 @@ public class ProjectDAO {
             			attribute = resultSet2.getNString("tsk_name");
             			tasks.add(attribute);
             			identifiers.add(resultSet2.getNString("tsk_identifier"));
-            		}
-            		else {
+            		} else {
             			attribute = resultSet1.getNString("tmt_id");
             			teammates.add(attribute);
             		}
