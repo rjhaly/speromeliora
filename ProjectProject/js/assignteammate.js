@@ -23,8 +23,9 @@ function processAssingTeammateResponse(result) {
 		const name = tsk_names[i];
 		// count # of . for tabs
 		for (let j = 0; j < id.length; j++)
-			if (id.charAt(j) == '.')
-				output += "\t";
+		  if (id.charAt(j) == '.')
+			output += "<span style=\"display:inline-block; width: 40px;\"></span>";
+		// display individual task
 		output += "<input type=\"checkbox\" id=\"checkbox" + id + "\" onclick=\"JavaScript:handleMarkTaskClick(this, " + id + ")\">" + id + ": " + name + "<br>";
 	}
 	output += "</div><p>";
