@@ -33,7 +33,7 @@ function processCreateResponse(result) {
 	output +="teammates: " 	  + js["project"]["teammates"] 	+ "<br>" +
 			 "isArchived: "   + js["project"]["isArchived"] + "</p>";
 	// Update Displays
-	workingProject.innerHTML = result;
+	workingProject.innerHTML = js["project"]["pid"];
   	cons.innerHTML = "<p>Project successfully created.</p>";
 	proj.innerHTML = output;
   } else if (status === 400) {
