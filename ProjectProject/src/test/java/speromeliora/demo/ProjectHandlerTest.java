@@ -58,7 +58,7 @@ public class ProjectHandlerTest extends LambdaTest{
     	CreateProjectRequest req = new Gson().fromJson(incoming, CreateProjectRequest.class);
         CreateProjectResponse response = handler.handleRequest(req, createContext("compute"));
 
-        Assert.assertEquals(outgoing, response.projectID);
+        Assert.assertEquals(outgoing, response.project.getPid());
         Assert.assertEquals(200, response.statusCode);
     }
     
@@ -79,7 +79,7 @@ public class ProjectHandlerTest extends LambdaTest{
     	ArchiveProjectRequest req = new Gson().fromJson(incoming, ArchiveProjectRequest.class);
         ArchiveProjectResponse response = handler.handleRequest(req, createContext("compute"));
 
-        Assert.assertEquals(outgoing, response.projectID);
+        Assert.assertEquals(outgoing, response.project.getPid());
         Assert.assertEquals(200, response.statusCode);
     }
 
