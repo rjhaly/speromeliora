@@ -42,6 +42,7 @@ public class ProjectHandlerTest extends LambdaTest{
 
     private final String CONTENT_TYPE = "image/jpeg";
     private S3Event event;
+    private clearDB nuke = new clearDB();
 
     @Mock
     private AmazonS3 s3Client;
@@ -84,6 +85,7 @@ public class ProjectHandlerTest extends LambdaTest{
 
     @Test
     public void testprojectHandler() {
+    	nuke.nukeDB();
     	String SAMPLE_INPUT_STRING = "{\"arg1\": \"project1\"}";
         String RESULT = "project1";
         

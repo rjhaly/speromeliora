@@ -31,6 +31,24 @@ public class ProjectDAO {
     	}
     }
     
+    public ProjectDAO() {
+    	try  {
+    		conn = DatabaseUtil.connect();
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    		conn = null;
+    	}
+    }
+    public void emptyDB() throws SQLException {
+    	PreparedStatement ps = conn.prepareStatement("DELETE FROM projects;");
+    	ps.execute();
+    	ps = conn.prepareStatement("DELETE FROM tasks;");
+    	ps.execute();
+    	ps = conn.prepareStatement("DELETE FROM teammates;");
+    	ps.execute();
+    	ps = conn.prepareStatement("DELETE FROM lookup_table;");
+    	ps.execute();
+    }
     public int findTaskID(String pid, String identifier) throws Exception{
     	PreparedStatement ps = conn.prepareStatement("SELECT * FROM lookup_table WHERE pid = ?;");
     	ps.setNString(1, pid);

@@ -61,4 +61,39 @@ public class DatabaseUtil {
 			throw new Exception("Failed in database connection");
 		}
 	}
+	
+	protected static Connection connect() throws Exception {
+		if (conn != null) { return conn; }
+		boolean useTestDB = System.getenv("TESTING") != null;
+		
+		// this is resistant to any SQL-injection attack since we choose one of two possible ones.
+		String schemaName = dbName;
+		if (useTestDB) { 
+			schemaName = testingName;
+			System.out.println("USE TEST DB:" + useTestDB);
+		}
+		
+		dbUsername = System.getenv("dbUsername");
+		if (dbUsername == null) {
+			System.err.println("Environment variable dbUsername is not set!");
+		}
+		dbPassword = System.getenv("dbPassword");
+		if (dbPassword == null) {
+			System.err.println("Environment variable dbPassword is not set!");
+		}
+		rdsMySqlDatabaseUrl = System.getenv("rdsMySqlDatabaseUrl");
+		if (rdsMySqlDatabaseUrl == null) {
+			System.err.println("Environment variable rdsMySqlDatabaseUrl is not set!");
+		}
+		try {
+			Class.forName("com.mysql.cj.jdbc.Driver"); 
+			conn = DriverManager.getConnection(jdbcTag + rdsMySqlDatabaseUrl + ":" + rdsMySqlDatabasePort + "/" + schemaName + multiQueries,
+					dbUsername,
+					dbPassword);
+			return conn;
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			throw new Exception("Failed in database connection");
+		}
+	}
 }
