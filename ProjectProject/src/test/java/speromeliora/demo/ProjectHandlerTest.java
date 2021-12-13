@@ -25,6 +25,7 @@ import com.amazonaws.services.s3.model.S3Object;
 import com.google.gson.Gson;
 
 import speromeliora.http.AddTaskRequest;
+import speromeliora.http.AddTaskResponse;
 import speromeliora.http.ArchiveProjectRequest;
 import speromeliora.http.ArchiveProjectResponse;
 import speromeliora.http.CreateProjectRequest;
@@ -168,20 +169,44 @@ public class ProjectHandlerTest extends LambdaTest{
 		}
     }
     @Test
+    public void testAddTaskHandler() throws SQLException {
+    	nuke.nukeDB();
+    	CreateProjectHandler chandler = new CreateProjectHandler();
+    	CreateProjectRequest creq = new Gson().fromJson("{\"arg1\": \"project1\"}", CreateProjectRequest.class);
+    	chandler.handleRequest(creq, createContext("compute"));
+    	AddTaskRequest treq = new Gson().fromJson("{\"arg1\": \"task1\", \"arg2\": \"\", \"arg3\": \"project1\"}", AddTaskRequest.class);
+    	AddTasksHandler thandler = new AddTasksHandler();
+    	ArrayList<String> tasks = new ArrayList<>();
+    	tasks.add("task1");
+    	ArrayList<String> taskIdents = new ArrayList<>();
+    	taskIdents.add("1");
+        Project project = new Project("project1", tasks, new ArrayList<String>(), taskIdents, false);
+        AddTaskResponse response = thandler.handleRequest(treq, createContext("compute"));
+		Assert.assertEquals(project.getPid(), response.project.getPid());
+		Assert.assertEquals(project.getTasks().get(0), response.project.getTasks().get(0));
+		Assert.assertEquals(project.getIdentifiers().get(0), response.project.getIdentifiers().get(0));
+		Assert.assertEquals(200, response.statusCode);
+    }
+    @Test
     public void testRenameTaskHandler() throws SQLException {
     	nuke.nukeDB();
     	CreateProjectHandler chandler = new CreateProjectHandler();
     	CreateProjectRequest creq = new Gson().fromJson("{\"arg1\": \"project1\"}", CreateProjectRequest.class);
     	chandler.handleRequest(creq, createContext("compute"));
-    	AddTaskRequest treq = new Gson().fromJson("{\"arg1\": \"project1\"}", AddTaskRequest.class);
+    	AddTaskRequest treq = new Gson().fromJson("{\"arg1\": \"task1\", \"arg2\": \"\", \"arg3\": \"project1\"}", AddTaskRequest.class);
     	AddTasksHandler thandler = new AddTasksHandler();
-    	String SAMPLE_INPUT_STRING = "{\"arg1\": \"project1\", \"arg2\": \"PROJECT1\"}";
-        Project project = new Project("PROJECT1", new ArrayList<String>(), new ArrayList<String>(), new ArrayList<String>(), false);
-        RenameTaskHandler handler = new RenameTaskHandler();
-        RenameTaskRequest req = new Gson().fromJson(SAMPLE_INPUT_STRING, RenameTaskRequest.class);
-		RenameTaskResponse response = handler.handleRequest(req, createContext("compute"));
-
+    	thandler.handleRequest(treq, createContext("compute"));
+    	RenameTaskHandler rhandler = new RenameTaskHandler();
+    	RenameTaskRequest rreq = new Gson().fromJson("{\"arg1\": \"task1.0\", \"arg2\": \"1\", \"arg3\": \"project1\"}", RenameTaskRequest.class);
+    	RenameTaskResponse response = rhandler.handleRequest(rreq, createContext("compute"));
+    	ArrayList<String> tasks = new ArrayList<>();
+    	tasks.add("task1.0");
+    	ArrayList<String> taskIdents = new ArrayList<>();
+    	taskIdents.add("1");
+        Project project = new Project("project1", tasks, new ArrayList<String>(), taskIdents, false);
 		Assert.assertEquals(project.getPid(), response.project.getPid());
+		Assert.assertEquals(project.getTasks().get(0), response.project.getTasks().get(0));
+		Assert.assertEquals(project.getIdentifiers().get(0), response.project.getIdentifiers().get(0));
 		Assert.assertEquals(200, response.statusCode);
     }
 }

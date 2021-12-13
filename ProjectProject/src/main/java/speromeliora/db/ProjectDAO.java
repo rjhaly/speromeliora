@@ -255,7 +255,7 @@ public class ProjectDAO {
         				"INSERT INTO tasks (tsk_name, isComplete, isBottomLevel, parent_tsk_id, tsk_identifier) "
         				+ "values(?,false,true,?,?);");
         		ps.setString(1,  tasks[i]);
-        		if(parentTaskIdentifier != "") {
+        		if(!parentTaskIdentifier.equals("")) {
         			logger.log("creating task with parent");
         			PreparedStatement ps1 = conn.prepareStatement("SELECT * FROM tasks WHERE tsk_identifier = ?;");
         			ps1.setString(1, parentTaskIdentifier);
