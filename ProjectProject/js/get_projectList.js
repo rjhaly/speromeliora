@@ -11,8 +11,6 @@ function processGetListResponse(result) {
   // Can grab any DIV or SPAN HTML element and can then manipulate its contents dynamically via javascript
   var js = JSON.parse(result);
   var proj = document.getElementById('projectListDisplay');
-  
-  var output = "";
 
   if(js["statusCode"] === 200){
 	for(var i = 0; i < js["projects"].length; i++){

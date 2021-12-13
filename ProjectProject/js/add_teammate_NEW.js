@@ -8,25 +8,28 @@ function processAddTeammateResponse(result) {
   let proj = document.getElementById("getProjectDisplay");
   let cons = document.getElementById("consoleMessageDisplay");
 
-  let output = "";
-
   if(js["statusCode"] == 200) {
-	// project output 
-	output = "<p>" + "Project Name: " + js["project"]["pid"] + "<br>";
+	// Project output
+	pid = js["project"]["pid"];
+	output = "<p>" + "Project Name: " + pid + "<br>";
 	
 	const tsk_ids = js["project"]["identifiers"];
 	const tsk_names = js["project"]["tasks"];
 	
 	output += "</p><div class=\"left\">";
 	for (let i = 0; i < tsk_ids.length; i++) {
-		const id = tsk_ids[i];
+		identifier = tsk_ids[i];
 		const name = tsk_names[i];
+		getTaskCompletionStatus(); // update tid, isCompleted
 		// count # of . for tabs
-		for (let j = 0; j < id.length; j++)
-		  if (id.charAt(j) == '.')
+		for (let j = 0; j < identifier.length; j++)
+		  if (identifier.charAt(j) == '.')
 			output += "<span style=\"display:inline-block; width: 40px;\"></span>";
 		// display individual task
-		output += "<input type=\"checkbox\" id=\"checkbox" + id + "\" onclick=\"JavaScript:handleMarkTaskClick(this, " + id + ")\">" + id + ": " + name + "<br>";
+		console.log(tid);
+		output += "<input type=\"checkbox\"" + (isCompleted ? "checked" : "unchecked") + " id=\"checkbox" + tid +
+				  "\" onclick=\"JavaScript:getTaskCompletionStatus(); JavaScript:handleMarkTaskClick(this, " + tid + ")\">" +
+				  identifier + ": " + name + "<br>";
 	}
 	output += "</div><p>";
 	
@@ -75,4 +78,30 @@ function handleAddTeammateClick(e) {
       processAddTeammateResponse("N/A");
     }
   };
+}
+
+function getTaskCompletionStatus() {
+  var newURL = getTask_url + "?arg1=" + pid + "&arg2=" + identifier;
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", newURL, true);
+  xhr.send();
+
+  xhr.onloadend = function () {
+    console.log(xhr);
+    console.log(xhr.request);
+    if (xhr.readyState == XMLHttpRequest.DONE) {
+    	 if (xhr.status == 200) {
+	      console.log ("XHR:" + xhr.responseText);
+	      const js = JSON.parse(xhr.responseText);
+		  tid = js["task"]["taskID"];
+		  isCompleted = js["task"]["isCompleted"];
+		  console.log(tid);
+    	 } else {
+    		 console.log("actual:" + xhr.responseText)
+			  var js = JSON.parse(xhr.responseText);
+			  var err = js["response"];
+			  alert (err);
+    	 }
+    }
+  }
 }
