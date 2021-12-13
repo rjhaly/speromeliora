@@ -1,8 +1,10 @@
 package speromeliora.demo;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import org.junit.Assert;
@@ -22,6 +24,7 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3Object;
 import com.google.gson.Gson;
 
+import speromeliora.http.AddTaskRequest;
 import speromeliora.http.ArchiveProjectRequest;
 import speromeliora.http.ArchiveProjectResponse;
 import speromeliora.http.CreateProjectRequest;
@@ -58,7 +61,7 @@ public class ProjectHandlerTest extends LambdaTest{
     	CreateProjectRequest req = new Gson().fromJson(incoming, CreateProjectRequest.class);
         CreateProjectResponse response = handler.handleRequest(req, createContext("compute"));
 
-        Assert.assertEquals(outgoing, response.projectID);
+        Assert.assertEquals(outgoing, response.project.getPid());
         Assert.assertEquals(200, response.statusCode);
     }
     
@@ -79,12 +82,12 @@ public class ProjectHandlerTest extends LambdaTest{
     	ArchiveProjectRequest req = new Gson().fromJson(incoming, ArchiveProjectRequest.class);
         ArchiveProjectResponse response = handler.handleRequest(req, createContext("compute"));
 
-        Assert.assertEquals(outgoing, response.projectID);
+        Assert.assertEquals(outgoing, response.project.getPid());
         Assert.assertEquals(200, response.statusCode);
     }
 
     @Test
-    public void testprojectHandler() {
+    public void testprojectHandler() throws SQLException {
     	nuke.nukeDB();
     	String SAMPLE_INPUT_STRING = "{\"arg1\": \"project1\"}";
         String RESULT = "project1";
@@ -96,9 +99,13 @@ public class ProjectHandlerTest extends LambdaTest{
         }
     }
     @Test
-    public void testgetprojectHandler() {
+    public void testgetprojectHandler() throws SQLException {
+    	nuke.nukeDB();
+    	CreateProjectHandler handler = new CreateProjectHandler();
+    	CreateProjectRequest req = new Gson().fromJson("{\"arg1\": \"project1\"}", CreateProjectRequest.class);
+    	handler.handleRequest(req, createContext("compute"));
     	String SAMPLE_INPUT_STRING = "project1";
-        Project RESULT = new Project("project1", new ArrayList<>(), new ArrayList<>(), false);
+        Project RESULT = new Project("project1", new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), false);
         
         try {
         	testGetInput(SAMPLE_INPUT_STRING, RESULT);
@@ -107,7 +114,11 @@ public class ProjectHandlerTest extends LambdaTest{
         }
     }
     @Test
-    public void testArchiveProjectHandler() {
+    public void testArchiveProjectHandler() throws SQLException {
+    	nuke.nukeDB();
+    	CreateProjectHandler handler = new CreateProjectHandler();
+    	CreateProjectRequest req = new Gson().fromJson("{\"arg1\": \"project1\"}", CreateProjectRequest.class);
+    	handler.handleRequest(req, createContext("compute"));
     	String SAMPLE_INPUT_STRING = "{\"arg1\": \"project1\"}";
         String RESULT = "project1";
         
@@ -119,7 +130,11 @@ public class ProjectHandlerTest extends LambdaTest{
     }
     
     @Test
-    public void testDeleteProjectHandler() {
+    public void testDeleteProjectHandler() throws SQLException {
+    	nuke.nukeDB();
+    	CreateProjectHandler chandler = new CreateProjectHandler();
+    	CreateProjectRequest creq = new Gson().fromJson("{\"arg1\": \"project1\"}", CreateProjectRequest.class);
+    	chandler.handleRequest(creq, createContext("compute"));
     	String SAMPLE_INPUT_STRING = "{\"arg1\": \"project1\"}";
         int RESULT = 200;
         
@@ -132,9 +147,13 @@ public class ProjectHandlerTest extends LambdaTest{
     }
     
     @Test
-    public void testListProjectHandler() {
+    public void testListProjectHandler() throws SQLException {
+    	nuke.nukeDB();
+    	CreateProjectHandler chandler = new CreateProjectHandler();
+    	CreateProjectRequest creq = new Gson().fromJson("{\"arg1\": \"project1\"}", CreateProjectRequest.class);
+    	chandler.handleRequest(creq, createContext("compute"));
     	String SAMPLE_INPUT_STRING = "{\"arg1\": \"project1\"}";
-        Project project = new Project("project1", new ArrayList<String>(), new ArrayList<String>(), false);
+        Project project = new Project("project1", new ArrayList<String>(), new ArrayList<String>(), new ArrayList<String>(), false);
         ArrayList<Project> testProjies = new ArrayList<>();
         testProjies.add(project);
         ListProjectHandler handler = new ListProjectHandler();
@@ -149,14 +168,20 @@ public class ProjectHandlerTest extends LambdaTest{
 		}
     }
     @Test
-    public void testRenameProjectHandler() {
-    	String SAMPLE_INPUT_STRING = "{\"arg1\": \"31\", \"arg2\": \"quintilly\"}";
-        Project project = new Project("project1", new ArrayList<String>(), new ArrayList<String>(), false);
-        ArrayList<Project> testProjies = new ArrayList<>();
-        testProjies.add(project);
+    public void testRenameTaskHandler() throws SQLException {
+    	nuke.nukeDB();
+    	CreateProjectHandler chandler = new CreateProjectHandler();
+    	CreateProjectRequest creq = new Gson().fromJson("{\"arg1\": \"project1\"}", CreateProjectRequest.class);
+    	chandler.handleRequest(creq, createContext("compute"));
+    	AddTaskRequest treq = new Gson().fromJson("{\"arg1\": \"project1\"}", AddTaskRequest.class);
+    	AddTasksHandler thandler = new AddTasksHandler();
+    	String SAMPLE_INPUT_STRING = "{\"arg1\": \"project1\", \"arg2\": \"PROJECT1\"}";
+        Project project = new Project("PROJECT1", new ArrayList<String>(), new ArrayList<String>(), new ArrayList<String>(), false);
         RenameTaskHandler handler = new RenameTaskHandler();
         RenameTaskRequest req = new Gson().fromJson(SAMPLE_INPUT_STRING, RenameTaskRequest.class);
 		RenameTaskResponse response = handler.handleRequest(req, createContext("compute"));
 
+		Assert.assertEquals(project.getPid(), response.project.getPid());
+		Assert.assertEquals(200, response.statusCode);
     }
 }
