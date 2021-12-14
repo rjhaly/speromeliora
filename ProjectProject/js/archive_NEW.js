@@ -13,6 +13,8 @@ function processArchive(result) {
   if(js["statusCode"] == 200) {
 	
 	if (workingView.innerHTML === "projectView") {
+	   percentage = 0;
+		
 		// Project View output
 		const pid = js["project"]["pid"];
 		output += "<p>" + "Project Name: " + pid + "<br>";
@@ -22,9 +24,11 @@ function processArchive(result) {
 		output += "</p><div class=\"left\">";
 		// Display Tasks
 		for (let i = 0; i < tasks.length; i++) {
+			t = t + 1;
 			const task = tasks[i];
 			const identifier = task["taskIdentifier"];
 			const name = task["name"];
+			const teammates = task["teammates"];
 			// count # of . for tabs
 			for (let j = 0; j < identifier.length; j++)
 			  if (identifier.charAt(j) == '.')
@@ -34,17 +38,28 @@ function processArchive(result) {
 			const isCompleted = task["isCompleted"];
 			if (isCompleted) {
 				output += "<img src='checkbox.png'></img>";
+				p = p + 1;
 			} else {
 				output += "<img src='uncheckbox.png'></img>";
 			}
 			
 			// display individual task
-			output += identifier + ": " + name + "<br>";
+			output += identifier + ": " + name + " (" + teammates + ")" + "<br>";
 		}
 		output += "</div><p>";
 		
 		output +="teammates: " 	  + js["project"]["teammates"] 	+ "<br>" +
 				 "isArchived: "   + js["project"]["isArchived"] + "</p>";
+		if (t == 0){
+			percentage = 0;
+		}
+		else {percentage = Math.round(p/t * 100);}
+		
+		console.log( "t = " + t);
+		console.log( "p = " + p);
+		console.log(percentage+"%");
+		
+		
 	} else {
 		// Team View output
 		const pid = js["project"]["pid"];
@@ -66,6 +81,7 @@ function processArchive(result) {
 					var newTask = [];
 					newTask.push(task["taskIdentifier"]);
 					newTask.push(task["name"]);
+					newTask.push(task["isCompleted"]);
 					newTmt.push(newTask);
 				}
 			}
@@ -78,14 +94,22 @@ function processArchive(result) {
 		for (let i = 0; i < teammateTasks.length; i++) {
 			const teammateTask = teammateTasks[i];
 			const tmtName = teammateTask[0];
-			output += "<b>" + tmtName + "</b><br>" + 
-					  "<span style='display:inline-block; width: 40px;'></span>";
+			output += "<b>" + tmtName + "</b><br>";
+			// display teammate's tasks
 			for (let j = 1; j < teammateTask.length; j++) {
+				output += "<span style='display:inline-block; width: 40px;'></span>";
 				const taskIdentifier = teammateTask[j][0];
 				const taskName = teammateTask[j][1];
-				output += taskIdentifier + ",";
+				const isCompleted = teammateTask[j][2];
+				
+				if (isCompleted)
+					output += "<img src='checkbox.png'></img>";
+				else
+					output += "<img src='uncheckbox.png'></img>";
+				
+				output += taskIdentifier + ": " + taskName + "<br>";
 			}
-			output = output.substring(0, output.length - 1) + "<br>";
+			output = output.substring(0, output.length - 1) + "<br><br>";
 		}
 		output += "</div><p>";
 	}
