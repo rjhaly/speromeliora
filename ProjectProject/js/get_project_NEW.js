@@ -13,12 +13,19 @@ function processGetProjectResponse(result) {
   let cons = document.getElementById("consoleMessageDisplay");
   let workingProject = document.getElementById("workingProject");
   var workingView = document.getElementById("workingView");
+  p = 0;
+  t = 0;
+  percentage = 0;
+  let per = document.getElementById("percentagedisplay");
 
   var output = "";
+  
 
   if(js["statusCode"] == 200){
 	
 	if (workingView.innerHTML === "projectView") {
+	   percentage = 0;
+		
 		// Project View output
 		const pid = js["project"]["pid"];
 		output += "<p>" + "Project Name: " + pid + "<br>";
@@ -28,6 +35,7 @@ function processGetProjectResponse(result) {
 		output += "</p><div class=\"left\">";
 		// Display Tasks
 		for (let i = 0; i < tasks.length; i++) {
+			t = t + 1;
 			const task = tasks[i];
 			const identifier = task["taskIdentifier"];
 			const name = task["name"];
@@ -40,6 +48,7 @@ function processGetProjectResponse(result) {
 			const isCompleted = task["isCompleted"];
 			if (isCompleted) {
 				output += "<img src='checkbox.png'></img>";
+				p = p + 1;
 			} else {
 				output += "<img src='uncheckbox.png'></img>";
 			}
@@ -51,6 +60,13 @@ function processGetProjectResponse(result) {
 		
 		output +="teammates: " 	  + js["project"]["teammates"] 	+ "<br>" +
 				 "isArchived: "   + js["project"]["isArchived"] + "</p>";
+			
+		percentage = Math.round(p/t * 100);
+		console.log( "t = " + t);
+		console.log( "p = " + p);
+		console.log(percentage+"%");
+		
+		
 	} else {
 		// Team View output
 		const pid = js["project"]["pid"];
@@ -100,12 +116,15 @@ function processGetProjectResponse(result) {
 	proj.innerHTML = output;
 	cons.innerHTML = "<p>Console Message Display</p>";
 	workingProject.innerHTML = js["project"]["pid"];
+	per.innerHTML = "<p>"+ "Percentage complete:"+ percentage+ "%" + "</p>";
+	
 	
   } else {
 	output = "<p>Could not retrieve project</p>";
 	proj.innerHTML = "<p></p>";
 	workingProject.innerHTML = "";
 	cons.innerHTML = output;
+	per.innerHTML = "";
   }
   
 }

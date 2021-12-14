@@ -6,7 +6,6 @@
 <script type='text/javascript' src='../js/get_project_NEW.js'></script>
 <script type='text/javascript' src='../js/create.js'></script>
 <script type='text/javascript' src='../js/delete.js'></script>
-<script type='text/javascript' src='../js/add_teammate.js'></script>
 <script type='text/javascript' src='../js/archive_NEW.js'></script>
 
 
@@ -134,8 +133,6 @@ input[type=text], select {
 
 <div id="projectList"></div>
 
-<div style="visibility: hidden" id="workingView">projectView</div>
-
 <div class = "positiona" >
 <div id = "projectListDisplay"></div>
 <div style="visibility: hidden" id= workingProject> </div>
@@ -152,13 +149,18 @@ input[type=text], select {
 
 
 <div class="dropdown">
-  <button class="dropbtn"> <div id ="getProjectDisplay"></div></button>
+  <button class="dropbtn"> <div id ="getProjectDisplay"></div>
+   <div id = "percentagedisplay"></div></button>
   <div class="dropdown-content">
     <button onClick ="JavaScript:handleProjectDeleteClick(this)" class="button button2">Delete Project</button>
     <button onClick ="JavaScript:handleProjectArchiveClick(this)" class="button button2">Archive Project</button>
   </div>
 </div>
 
+
+
+
+<div style="visibility: hidden" id="workingView">projectView</div>
 
 
 
