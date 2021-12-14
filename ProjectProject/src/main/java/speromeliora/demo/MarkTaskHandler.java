@@ -43,7 +43,7 @@ public class MarkTaskHandler implements RequestHandler<MarkTaskRequest, MarkTask
 		}
 		if (pid != "" && identifier != "") {
 			try {
-				markTaskInRDS(pid, identifier);
+				project = markTaskInRDS(pid, identifier);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
