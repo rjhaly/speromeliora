@@ -61,8 +61,11 @@ function processGetProjectResponse(result) {
 		
 		output +="teammates: " 	  + js["project"]["teammates"] 	+ "<br>" +
 				 "isArchived: "   + js["project"]["isArchived"] + "</p>";
-			
-		percentage = Math.round(p/t * 100);
+		if (t == 0){
+			percentage = 0;
+		}
+		else {percentage = Math.round(p/t * 100);}
+		
 		console.log( "t = " + t);
 		console.log( "p = " + p);
 		console.log(percentage+"%");
