@@ -39,6 +39,7 @@ function processGetProjectResponse(result) {
 			const task = tasks[i];
 			const identifier = task["taskIdentifier"];
 			const name = task["name"];
+			const teammates = task["teammates"];
 			// count # of . for tabs
 			for (let j = 0; j < identifier.length; j++)
 			  if (identifier.charAt(j) == '.')
@@ -54,7 +55,7 @@ function processGetProjectResponse(result) {
 			}
 			
 			// display individual task
-			output += identifier + ": " + name + "<br>";
+			output += identifier + ": " + name + " (" + teammates + ")" + "<br>";
 		}
 		output += "</div><p>";
 		
@@ -88,6 +89,7 @@ function processGetProjectResponse(result) {
 					var newTask = [];
 					newTask.push(task["taskIdentifier"]);
 					newTask.push(task["name"]);
+					newTask.push(task["isCompleted"]);
 					newTmt.push(newTask);
 				}
 			}
@@ -100,14 +102,22 @@ function processGetProjectResponse(result) {
 		for (let i = 0; i < teammateTasks.length; i++) {
 			const teammateTask = teammateTasks[i];
 			const tmtName = teammateTask[0];
-			output += "<b>" + tmtName + "</b><br>" + 
-					  "<span style='display:inline-block; width: 40px;'></span>";
+			output += "<b>" + tmtName + "</b><br>";
+			// display teammate's tasks
 			for (let j = 1; j < teammateTask.length; j++) {
+				output += "<span style='display:inline-block; width: 40px;'></span>";
 				const taskIdentifier = teammateTask[j][0];
 				const taskName = teammateTask[j][1];
-				output += taskIdentifier + ",";
+				const isCompleted = teammateTask[j][2];
+				
+				if (isCompleted)
+					output += "<img src='checkbox.png'></img>";
+				else
+					output += "<img src='uncheckbox.png'></img>";
+				
+				output += taskIdentifier + ": " + taskName + "<br>";
 			}
-			output = output.substring(0, output.length - 1) + "<br>";
+			output = output.substring(0, output.length - 1) + "<br><br>";
 		}
 		output += "</div><p>";
 	}
