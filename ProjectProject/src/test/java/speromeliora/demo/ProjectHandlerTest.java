@@ -26,20 +26,29 @@ import com.google.gson.Gson;
 
 import speromeliora.http.AddTaskRequest;
 import speromeliora.http.AddTaskResponse;
+import speromeliora.http.AddTeammateRequest;
+import speromeliora.http.AddTeammateResponse;
+import speromeliora.http.AllocateTeammateRequest;
+import speromeliora.http.AllocateTeammateResponse;
 import speromeliora.http.ArchiveProjectRequest;
 import speromeliora.http.ArchiveProjectResponse;
 import speromeliora.http.CreateProjectRequest;
 import speromeliora.http.CreateProjectResponse;
+import speromeliora.http.DeallocateTeammateRequest;
+import speromeliora.http.DeallocateTeammateResponse;
 import speromeliora.http.DeleteProjectRequest;
 import speromeliora.http.DeleteProjectResponse;
 import speromeliora.http.GetProjectResponse;
 import speromeliora.http.ListProjectResponse;
 import speromeliora.http.MarkTaskRequest;
 import speromeliora.http.MarkTaskResponse;
+import speromeliora.http.RemoveTeammateRequest;
+import speromeliora.http.RemoveTeammateResponse;
 import speromeliora.http.RenameTaskRequest;
 import speromeliora.http.RenameTaskResponse;
 import speromeliora.model.Project;
 import speromeliora.model.Task;
+import speromeliora.model.Teammate;
 
 /**
  * A simple test harness for locally invoking your Lambda function handler.
@@ -179,11 +188,11 @@ public class ProjectHandlerTest extends LambdaTest{
     	chandler.handleRequest(creq, createContext("compute"));
     	AddTaskRequest treq = new Gson().fromJson("{\"arg1\": \"task1\", \"arg2\": \"\", \"arg3\": \"project1\"}", AddTaskRequest.class);
     	AddTasksHandler thandler = new AddTasksHandler();
+        AddTaskResponse response = thandler.handleRequest(treq, createContext("compute"));
     	ArrayList<Task> tasks = new ArrayList<>();
     	Task task = new Task(1,false, true, new ArrayList<>(), "task1", "1", new ArrayList<>());
     	tasks.add(task);
         Project project = new Project("project1", tasks, new ArrayList<String>(), false);
-        AddTaskResponse response = thandler.handleRequest(treq, createContext("compute"));
 		Assert.assertEquals(project.getPid(), response.project.getPid());
 		Assert.assertEquals(project.getTasks().get(0).getName(), response.project.getTasks().get(0).getName());
 		Assert.assertEquals(project.getTasks().get(0).getTaskIdentifier(), response.project.getTasks().get(0).getTaskIdentifier());
@@ -231,6 +240,106 @@ public class ProjectHandlerTest extends LambdaTest{
 		Assert.assertEquals(project.getTasks().get(0).getName(), response.project.getTasks().get(0).getName());
 		Assert.assertEquals(project.getTasks().get(0).getTaskIdentifier(), response.project.getTasks().get(0).getTaskIdentifier());
 		Assert.assertEquals(project.getTasks().get(0).getIsCompleted(), response.project.getTasks().get(0).getIsCompleted());
+		Assert.assertEquals(200, response.statusCode);
+    }
+    
+    @Test
+    public void testAddTeammateHandler() throws SQLException {
+    	nuke.nukeDB();
+    	CreateProjectHandler chandler = new CreateProjectHandler();
+    	CreateProjectRequest creq = new Gson().fromJson("{\"arg1\": \"project1\"}", CreateProjectRequest.class);
+    	chandler.handleRequest(creq, createContext("compute"));
+    	AddTeammateRequest treq = new Gson().fromJson("{\"arg1\": \"project1\", \"arg2\": \"teammate1\"}", AddTeammateRequest.class);
+    	AddTeammateHandler thandler = new AddTeammateHandler();
+    	AddTeammateResponse response = thandler.handleRequest(treq, createContext("compute"));
+    	ArrayList<String> teammates = new ArrayList<>();
+    	teammates.add("teammate1");
+        Project project = new Project("project1", new ArrayList<>(), teammates, false);
+		Assert.assertEquals(project.getPid(), response.project.getPid());
+		Assert.assertEquals(project.getTeammates().get(0), response.project.getTeammates().get(0));
+		Assert.assertEquals(200, response.statusCode);
+    }
+    
+    @Test
+    public void testRemoveTeammateHandler() throws SQLException {
+    	nuke.nukeDB();
+    	CreateProjectHandler chandler = new CreateProjectHandler();
+    	CreateProjectRequest creq = new Gson().fromJson("{\"arg1\": \"project1\"}", CreateProjectRequest.class);
+    	chandler.handleRequest(creq, createContext("compute"));
+    	AddTeammateRequest treq = new Gson().fromJson("{\"arg1\": \"project1\", \"arg2\": \"teammate1\"}", AddTeammateRequest.class);
+    	AddTeammateHandler thandler = new AddTeammateHandler();
+    	thandler.handleRequest(treq, createContext("compute"));
+    	RemoveTeammateRequest rreq = new Gson().fromJson("{\"arg1\": \"project1\", \"arg2\": \"teammate1\"}", RemoveTeammateRequest.class);
+    	RemoveTeammateHandler rhandler = new RemoveTeammateHandler();
+    	RemoveTeammateResponse response = rhandler.handleRequest(rreq, createContext("compute"));
+        Project project = new Project("project1", new ArrayList<>(), new ArrayList<>(), false);
+		Assert.assertEquals(project.getPid(), response.project.getPid());
+		Assert.assertEquals(project.getTeammates(), response.project.getTeammates());
+		Assert.assertEquals(200, response.statusCode);
+    }
+    
+    @Test
+    public void testAllocateTeammateHandler() throws SQLException {
+    	nuke.nukeDB();
+    	CreateProjectHandler chandler = new CreateProjectHandler();
+    	CreateProjectRequest creq = new Gson().fromJson("{\"arg1\": \"project1\"}", CreateProjectRequest.class);
+    	chandler.handleRequest(creq, createContext("compute"));
+    	AddTeammateRequest treq = new Gson().fromJson("{\"arg1\": \"project1\", \"arg2\": \"teammate1\"}", AddTeammateRequest.class);
+    	AddTeammateHandler thandler = new AddTeammateHandler();
+    	thandler.handleRequest(treq, createContext("compute"));
+    	AddTaskRequest tsreq = new Gson().fromJson("{\"arg1\": \"task1\", \"arg2\": \"\", \"arg3\": \"project1\"}", AddTaskRequest.class);
+    	AddTasksHandler tshandler = new AddTasksHandler();
+        tshandler.handleRequest(tsreq, createContext("compute"));
+    	
+    	AllocateTeammateRequest ttreq = new Gson().fromJson("{\"arg1\": \"project1\", \"arg2\": \"teammate1\", \"arg3\": \"1\"}", AllocateTeammateRequest.class);
+    	AllocateTeammateHandler tthandler = new AllocateTeammateHandler();
+    	AllocateTeammateResponse response = tthandler.handleRequest(ttreq, createContext("compute"));
+    	ArrayList<String> teammates = new ArrayList<>();
+    	teammates.add("teammate1");
+    	ArrayList<Task> tasks = new ArrayList<>();
+    	Task task = new Task(1,false, true, new ArrayList<>(), "task1", "1", teammates);
+    	tasks.add(task);
+        Project project = new Project("project1", tasks, teammates, false);
+		Assert.assertEquals(project.getPid(), response.project.getPid());
+		Assert.assertEquals(project.getTeammates().get(0), response.project.getTeammates().get(0));
+		Assert.assertEquals(project.getTasks().get(0).getName(), response.project.getTasks().get(0).getName());
+		Assert.assertEquals(project.getTasks().get(0).getTaskIdentifier(), response.project.getTasks().get(0).getTaskIdentifier());
+		Assert.assertEquals(project.getTasks().get(0).getTeammates().get(0), response.project.getTasks().get(0).getTeammates().get(0));
+		Assert.assertEquals(200, response.statusCode);
+    }
+    
+    @Test
+    public void testDeallocateTeammateHandler() throws SQLException {
+    	nuke.nukeDB();
+    	CreateProjectHandler chandler = new CreateProjectHandler();
+    	CreateProjectRequest creq = new Gson().fromJson("{\"arg1\": \"project1\"}", CreateProjectRequest.class);
+    	chandler.handleRequest(creq, createContext("compute"));
+    	AddTeammateRequest treq = new Gson().fromJson("{\"arg1\": \"project1\", \"arg2\": \"teammate1\"}", AddTeammateRequest.class);
+    	AddTeammateHandler thandler = new AddTeammateHandler();
+    	thandler.handleRequest(treq, createContext("compute"));
+    	AddTaskRequest tsreq = new Gson().fromJson("{\"arg1\": \"task1\", \"arg2\": \"\", \"arg3\": \"project1\"}", AddTaskRequest.class);
+    	AddTasksHandler tshandler = new AddTasksHandler();
+        tshandler.handleRequest(tsreq, createContext("compute"));
+    	
+    	AllocateTeammateRequest ttreq = new Gson().fromJson("{\"arg1\": \"project1\", \"arg2\": \"teammate1\", \"arg3\": \"1\"}", AllocateTeammateRequest.class);
+    	AllocateTeammateHandler tthandler = new AllocateTeammateHandler();
+    	tthandler.handleRequest(ttreq, createContext("compute"));
+    	
+    	DeallocateTeammateRequest dtreq = new Gson().fromJson("{\"arg1\": \"project1\", \"arg2\": \"teammate1\", \"arg3\": \"1\"}", DeallocateTeammateRequest.class);
+    	DeallocateTeammateHandler dthandler = new DeallocateTeammateHandler();
+    	DeallocateTeammateResponse response = dthandler.handleRequest(dtreq, createContext("compute"));
+    	
+    	ArrayList<String> teammates = new ArrayList<>();
+    	teammates.add("teammate1");
+    	ArrayList<Task> tasks = new ArrayList<>();
+    	Task task = new Task(1,false, true, new ArrayList<>(), "task1", "1", new ArrayList<>());
+    	tasks.add(task);
+        Project project = new Project("project1", tasks, teammates, false);
+		Assert.assertEquals(project.getPid(), response.project.getPid());
+		Assert.assertEquals(project.getTeammates().get(0), response.project.getTeammates().get(0));
+		Assert.assertEquals(project.getTasks().get(0).getName(), response.project.getTasks().get(0).getName());
+		Assert.assertEquals(project.getTasks().get(0).getTaskIdentifier(), response.project.getTasks().get(0).getTaskIdentifier());
+		Assert.assertEquals(project.getTasks().get(0).getTeammates().isEmpty(), response.project.getTasks().get(0).getTeammates().isEmpty());
 		Assert.assertEquals(200, response.statusCode);
     }
 }

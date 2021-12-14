@@ -440,7 +440,7 @@ public class ProjectDAO {
             ps.setString(1, pid);
             ps.setNString(2, teammateName);
             ps.execute();
-            ps = conn.prepareStatement("SELECT FROM lookup_table WHERE pid = ? && tmt_id IS NULL;");
+            ps = conn.prepareStatement("SELECT * FROM lookup_table WHERE pid = ? && tmt_id IS NULL;");
             ps.setNString(1, pid);
             resultSet = ps.executeQuery();
             while(resultSet.next()) {
@@ -597,7 +597,7 @@ public class ProjectDAO {
 		ps.setNString(1, pid);
 		ps.setNString(2, tmt_id);
 		ResultSet resultSet = ps.executeQuery();
-		if(resultSet.next()) {
+		if(!resultSet.next()) {
 			throw new Exception("Failed to allocate teammate: teammate not added to specified project");
 		}
 		
