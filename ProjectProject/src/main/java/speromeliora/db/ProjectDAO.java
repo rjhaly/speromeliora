@@ -3,15 +3,12 @@ package speromeliora.db;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.List;
 
 import com.amazonaws.services.lambda.runtime.LambdaLogger;
 
 import speromeliora.model.Project;
 import speromeliora.model.Task;
-import speromeliora.model.Teammate;
 
 public class ProjectDAO {
 	
@@ -93,7 +90,6 @@ public class ProjectDAO {
             
             ArrayList<Task> tasks = new ArrayList<Task>();
             ArrayList<String> teammates = new ArrayList<String>();
-            ArrayList<String> identifiers = new ArrayList<String>();
             boolean isArchived = false;
             
             createdProject = new Project(pid, tasks, teammates, isArchived);
@@ -142,7 +138,14 @@ public class ProjectDAO {
             			boolean isBottomLevel = taskRow.getBoolean("isBottomLevel");
             			ArrayList<String> subTasks = new ArrayList<String>();
             			ArrayList<String> taskTeammates = new ArrayList<String>();
-            			int parentTaskId = taskRow.getInt("parent_tsk_id");
+            			// find teammates
+            			PreparedStatement ps3 = conn.prepareStatement("SELECT * FROM lookup_table WHERE tsk_id = ? && pid IS NULL;");
+            			ps3.setInt(1, taskId);
+            			ResultSet resultSet3 = ps3.executeQuery();
+            			while (resultSet3.next()) {
+            				String tmtId = resultSet3.getNString("tmt_id");
+            				taskTeammates.add(tmtId);
+            			}
             			String taskIdentifier = taskRow.getNString("tsk_identifier");
             			Task newTask = new Task(taskId, isCompleted, isBottomLevel, subTasks, taskName, taskIdentifier, taskTeammates);
             			// insert tasks ordered by identifier
@@ -203,43 +206,7 @@ public class ProjectDAO {
             
             while(resultSet.next()) {
             	String pid = resultSet.getString("pid");
-            	boolean isArchived = resultSet.getBoolean("isArchived");
-            	ArrayList<Task> tasks = new ArrayList<>();
-            	ArrayList<String> teammates= new ArrayList<>();
-            	ArrayList<String> identifiers = new ArrayList<>();
-            	
-            	PreparedStatement ps1 = conn.prepareStatement("SELECT * FROM lookup_table WHERE pid = ?;");
-            	ps1.setString(1, pid);
-            	ResultSet resultSet1 = ps1.executeQuery();
-            	
-            	while(resultSet1.next()) {
-            		String attribute;
-            		if(resultSet1.getString("tsk_id") != null) {
-            			logger.log("Looking at task id " + resultSet1.getInt("tsk_id"));
-            			PreparedStatement ps2 = conn.prepareStatement("SELECT * FROM tasks WHERE tsk_id = ?;");
-            			ps2.setInt(1, resultSet1.getInt("tsk_id"));
-            			ResultSet resultSet2 = ps2.executeQuery();
-            			logger.log("" + resultSet2.next());
-            			// build task
-            			int taskId = resultSet2.getInt("tsk_id");
-            			String taskName = resultSet2.getNString("tsk_name");
-            			boolean isCompleted = resultSet2.getBoolean("isComplete");
-            			boolean isBottomLevel = resultSet2.getBoolean("isBottomLevel");
-            			ArrayList<String> subTasks = new ArrayList<String>();
-            			ArrayList<String> taskTeammates = new ArrayList<String>();
-            			int parentTaskId = resultSet2.getInt("parent_tsk_id");
-            			String taskIdentifier = resultSet2.getNString("tsk_identifier");
-            			Task newTask = new Task(taskId, isCompleted, isBottomLevel, subTasks, taskName, taskIdentifier, taskTeammates);
-            			// insert tasks ordered by identifier
-            			int i = 0;
-            			while (i < tasks.size() && taskIdentifier.compareTo(tasks.get(i).getTaskIdentifier()) > 0) i++;
-            			tasks.add(i, newTask);
-            		} else {
-            			attribute = resultSet1.getNString("tmt_id");
-            			teammates.add(attribute);
-            		}
-            	}
-            	Project project = new Project(pid, tasks, teammates, isArchived);
+            	Project project = getProject(pid);
             	projects.add(project);
             }
             return projects;
