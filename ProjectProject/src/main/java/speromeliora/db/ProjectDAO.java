@@ -91,12 +91,12 @@ public class ProjectDAO {
             ps.setBoolean(2,  false);
             ps.execute();
             
-            ArrayList<String> tasks = new ArrayList<String>();
+            ArrayList<Task> tasks = new ArrayList<Task>();
             ArrayList<String> teammates = new ArrayList<String>();
             ArrayList<String> identifiers = new ArrayList<String>();
             boolean isArchived = false;
             
-            createdProject = new Project(pid, tasks, teammates, identifiers, isArchived);
+            createdProject = new Project(pid, tasks, teammates, isArchived);
 
         } catch (Exception e) {
             throw new Exception("Failed to create project: " + e.getMessage());
@@ -118,9 +118,8 @@ public class ProjectDAO {
                 return null;
             } else {
             	String name = pid;
-            	ArrayList<String> tasks = new ArrayList<>();
+            	ArrayList<Task> tasks = new ArrayList<>();
             	ArrayList<String> teammates= new ArrayList<>();
-            	ArrayList<String> identifiers = new ArrayList<>();
             	boolean isArchived = resultSet.getBoolean("isArchived");
             	// find all rows for this project
             	ps = conn.prepareStatement("SELECT * FROM lookup_table WHERE pid = ?;");
@@ -136,19 +135,26 @@ public class ProjectDAO {
             			ps1.setInt(1, resultSet.getInt("tsk_id"));
             			ResultSet taskRow = ps1.executeQuery();
             			logger.log("" + taskRow.next());
-            			// insert tasks ordered by identifier
-            			String taskIdentifier = taskRow.getNString("tsk_identifier");
+            			// build task
+            			int taskId = taskRow.getInt("tsk_id");
             			String taskName = taskRow.getNString("tsk_name");
+            			boolean isCompleted = taskRow.getBoolean("isComplete");
+            			boolean isBottomLevel = taskRow.getBoolean("isBottomLevel");
+            			ArrayList<String> subTasks = new ArrayList<String>();
+            			ArrayList<String> taskTeammates = new ArrayList<String>();
+            			int parentTaskId = taskRow.getInt("parent_tsk_id");
+            			String taskIdentifier = taskRow.getNString("tsk_identifier");
+            			Task newTask = new Task(taskId, isCompleted, isBottomLevel, subTasks, taskName, taskIdentifier, taskTeammates);
+            			// insert tasks ordered by identifier
             			int i = 0;
-            			while (i < identifiers.size() && taskIdentifier.compareTo(identifiers.get(i)) > 0) i++;
-            			identifiers.add(i, taskIdentifier);
-            			tasks.add(i, taskName);
+            			while (i < tasks.size() && taskIdentifier.compareTo(tasks.get(i).getTaskIdentifier()) > 0) i++;
+            			tasks.add(i, newTask);
             		} else {
             			String teammateName = resultSet.getNString("tmt_id");
             			teammates.add(teammateName);
             		}
             	}
-            	Project project = new Project(name, tasks, teammates, identifiers, isArchived);
+            	Project project = new Project(name, tasks, teammates, isArchived);
             	return project;
             }
             
@@ -198,7 +204,7 @@ public class ProjectDAO {
             while(resultSet.next()) {
             	String pid = resultSet.getString("pid");
             	boolean isArchived = resultSet.getBoolean("isArchived");
-            	ArrayList<String> tasks = new ArrayList<>();
+            	ArrayList<Task> tasks = new ArrayList<>();
             	ArrayList<String> teammates= new ArrayList<>();
             	ArrayList<String> identifiers = new ArrayList<>();
             	
@@ -214,15 +220,26 @@ public class ProjectDAO {
             			ps2.setInt(1, resultSet1.getInt("tsk_id"));
             			ResultSet resultSet2 = ps2.executeQuery();
             			logger.log("" + resultSet2.next());
-            			attribute = resultSet2.getNString("tsk_name");
-            			tasks.add(attribute);
-            			identifiers.add(resultSet2.getNString("tsk_identifier"));
+            			// build task
+            			int taskId = resultSet2.getInt("tsk_id");
+            			String taskName = resultSet2.getNString("tsk_name");
+            			boolean isCompleted = resultSet2.getBoolean("isComplete");
+            			boolean isBottomLevel = resultSet2.getBoolean("isBottomLevel");
+            			ArrayList<String> subTasks = new ArrayList<String>();
+            			ArrayList<String> taskTeammates = new ArrayList<String>();
+            			int parentTaskId = resultSet2.getInt("parent_tsk_id");
+            			String taskIdentifier = resultSet2.getNString("tsk_identifier");
+            			Task newTask = new Task(taskId, isCompleted, isBottomLevel, subTasks, taskName, taskIdentifier, taskTeammates);
+            			// insert tasks ordered by identifier
+            			int i = 0;
+            			while (i < tasks.size() && taskIdentifier.compareTo(tasks.get(i).getTaskIdentifier()) > 0) i++;
+            			tasks.add(i, newTask);
             		} else {
             			attribute = resultSet1.getNString("tmt_id");
             			teammates.add(attribute);
             		}
             	}
-            	Project project = new Project(pid, tasks, teammates, identifiers, isArchived);
+            	Project project = new Project(pid, tasks, teammates, isArchived);
             	projects.add(project);
             }
             return projects;
@@ -443,32 +460,30 @@ public class ProjectDAO {
         }
     }
     
-    public Project markTask(int tid) throws Exception {
-        try {
-            PreparedStatement ps = conn.prepareStatement("SELECT * FROM tasks WHERE tsk_id = ?;");
-            ps.setInt(1, tid);
+    public Project markTask(String pid, String identifier) throws Exception {
+    	try {
+            PreparedStatement ps = conn.prepareStatement("SELECT * FROM lookup_table WHERE pid = ? && tmt_id IS NULL;");
+            ps.setString(1, pid);
             ResultSet resultSet = ps.executeQuery();
-            if(!resultSet.next()) {
-            	throw new Exception("Failed to mark task: " + "Unable to find task");
+            while(resultSet.next()) {
+            	ps = conn.prepareStatement("SELECT * FROM tasks WHERE tsk_id = ?;");
+            	ps.setInt(1, resultSet.getInt("tsk_id"));
+            	ResultSet resultSet1 = ps.executeQuery();
+            	if(!resultSet1.next()) {
+            		throw new Exception("Failed to mark task: " + "failed to find task");
+            	}
+            	if(resultSet1.getString("tsk_identifier").equals(identifier)) {
+            		logger.log("found task to update");
+            		ps = conn.prepareStatement("UPDATE tasks SET isComplete = !isComplete WHERE tsk_id = ?;");
+            		ps.setInt(1, resultSet.getInt("tsk_id"));
+            		ps.execute();
+            	}
             }
-            logger.log("task found");
-            ps =conn.prepareStatement("UPDATE tasks SET isComplete = !isComplete WHERE tsk_id = ?");
-            ps.setInt(1, tid);
-            ps.execute();
             logger.log("task updated");
-            ps = conn.prepareStatement("SELECT * FROM lookup_table WHERE tsk_id = ?;");
-            ps.setInt(1, tid);
-            resultSet = ps.executeQuery();
-            if(!resultSet.next()) {
-            	throw new Exception("Failed to mark task: " + "could not find task");
-            }
-            String pid = resultSet.getString("pid");
             return getProject(pid);
-            
-            
         } catch (Exception e) {
         	logger.log("exception thrown");
-            throw new Exception("Failed to mark task: " + "could not find task");
+            throw new Exception("Failed to mark task: " + e.getMessage());
         }
     }
     

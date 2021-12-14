@@ -12,17 +12,25 @@ function processGetListResponse(result) {
   var js = JSON.parse(result);
   var proj = document.getElementById('projectListDisplay');
 
-  if(js["statusCode"] === 200){
-	for(var i = 0; i < js["projects"].length; i++){
-		output = output + "Project Name: " + js["projects"][i]["pid"] + "<br>" +
-						  "tasks: " + js["projects"][i]["tasks"] +  "<br>" +
-						  "teammates: " + js["projects"][i]["teammates"] +  "<br>" +
-						  "isArchived: "  + js["projects"][i]["isArchived"] +  "<br><br>";
+  var output = "";
+
+  if (js["statusCode"] === 200) {
+	for (let i = 0; i < js["projects"].length; i++) {
+		output += "Project Name: " + js["projects"][i]["pid"] + "<br>" +
+				  "tasks: ";
+		
+		const tasks = js["projects"][i]["tasks"];
+		for (let j = 0; j < tasks.length; j++)
+		  output += tasks[j]["name"] + ",";
+		output = output.substring(0, output.length - 1); // trim last ,
+		
+		output += "<br>" +
+				  "teammates: " + js["projects"][i]["teammates"] +  "<br>" +
+				  "isArchived: "  + js["projects"][i]["isArchived"] +  "<br><br>";
 	}
-}
-  else{ 
+  } else {
 	output = "Could not retrieve projects";
-}
+  }
 
   // Update computation result
   proj.innerHTML = output;

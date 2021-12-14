@@ -32,16 +32,18 @@ public class MarkTaskHandler implements RequestHandler<MarkTaskRequest, MarkTask
 		boolean fail = false;
 		String failMessage = "";
 		Project project = new Project();
-		int tid = -1;
+		String pid = "";
+		String identifier = "";
 		try {
-			tid = req.getArg1();
+			pid = req.getArg1();
+			identifier = req.getArg2();
 		} catch (NumberFormatException e) {
 			failMessage = "Unable to parse parameters";
 			fail = true;
 		}
-		if (tid != -1) {
+		if (pid != "" && identifier != "") {
 			try {
-				markTaskInRDS(tid);
+				markTaskInRDS(pid, identifier);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -61,11 +63,11 @@ public class MarkTaskHandler implements RequestHandler<MarkTaskRequest, MarkTask
 		return response; 
 	}
     
-    public Project markTaskInRDS(int tid) throws Exception {
+    public Project markTaskInRDS(String pid, String identifier) throws Exception {
 		if (logger != null) { logger.log("in createProject"); }
 		ProjectDAO dao = new ProjectDAO(logger);
 		if (logger != null) { logger.log("retrieved DAO"); }
-		Project project = dao.markTask(tid);
+		Project project = dao.markTask(pid, identifier);
 		if (logger != null) { logger.log("markedTask"); }
 		return project;
 	}
