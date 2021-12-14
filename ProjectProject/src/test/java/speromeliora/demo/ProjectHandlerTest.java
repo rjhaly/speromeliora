@@ -34,9 +34,12 @@ import speromeliora.http.DeleteProjectRequest;
 import speromeliora.http.DeleteProjectResponse;
 import speromeliora.http.GetProjectResponse;
 import speromeliora.http.ListProjectResponse;
+import speromeliora.http.MarkTaskRequest;
+import speromeliora.http.MarkTaskResponse;
 import speromeliora.http.RenameTaskRequest;
 import speromeliora.http.RenameTaskResponse;
 import speromeliora.model.Project;
+import speromeliora.model.Task;
 
 /**
  * A simple test harness for locally invoking your Lambda function handler.
@@ -106,7 +109,7 @@ public class ProjectHandlerTest extends LambdaTest{
     	CreateProjectRequest req = new Gson().fromJson("{\"arg1\": \"project1\"}", CreateProjectRequest.class);
     	handler.handleRequest(req, createContext("compute"));
     	String SAMPLE_INPUT_STRING = "project1";
-        Project RESULT = new Project("project1", new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), false);
+        Project RESULT = new Project("project1", new ArrayList<>(), new ArrayList<>(), false);
         
         try {
         	testGetInput(SAMPLE_INPUT_STRING, RESULT);
@@ -154,7 +157,7 @@ public class ProjectHandlerTest extends LambdaTest{
     	CreateProjectRequest creq = new Gson().fromJson("{\"arg1\": \"project1\"}", CreateProjectRequest.class);
     	chandler.handleRequest(creq, createContext("compute"));
     	String SAMPLE_INPUT_STRING = "{\"arg1\": \"project1\"}";
-        Project project = new Project("project1", new ArrayList<String>(), new ArrayList<String>(), new ArrayList<String>(), false);
+        Project project = new Project("project1", new ArrayList<Task>(), new ArrayList<String>(), false);
         ArrayList<Project> testProjies = new ArrayList<>();
         testProjies.add(project);
         ListProjectHandler handler = new ListProjectHandler();
@@ -176,15 +179,14 @@ public class ProjectHandlerTest extends LambdaTest{
     	chandler.handleRequest(creq, createContext("compute"));
     	AddTaskRequest treq = new Gson().fromJson("{\"arg1\": \"task1\", \"arg2\": \"\", \"arg3\": \"project1\"}", AddTaskRequest.class);
     	AddTasksHandler thandler = new AddTasksHandler();
-    	ArrayList<String> tasks = new ArrayList<>();
-    	tasks.add("task1");
-    	ArrayList<String> taskIdents = new ArrayList<>();
-    	taskIdents.add("1");
-        Project project = new Project("project1", tasks, new ArrayList<String>(), taskIdents, false);
+    	ArrayList<Task> tasks = new ArrayList<>();
+    	Task task = new Task(1,false, true, new ArrayList<>(), "task1", "1", new ArrayList<>());
+    	tasks.add(task);
+        Project project = new Project("project1", tasks, new ArrayList<String>(), false);
         AddTaskResponse response = thandler.handleRequest(treq, createContext("compute"));
 		Assert.assertEquals(project.getPid(), response.project.getPid());
-		Assert.assertEquals(project.getTasks().get(0), response.project.getTasks().get(0));
-		Assert.assertEquals(project.getIdentifiers().get(0), response.project.getIdentifiers().get(0));
+		Assert.assertEquals(project.getTasks().get(0).getName(), response.project.getTasks().get(0).getName());
+		Assert.assertEquals(project.getTasks().get(0).getTaskIdentifier(), response.project.getTasks().get(0).getTaskIdentifier());
 		Assert.assertEquals(200, response.statusCode);
     }
     @Test
@@ -199,14 +201,36 @@ public class ProjectHandlerTest extends LambdaTest{
     	RenameTaskHandler rhandler = new RenameTaskHandler();
     	RenameTaskRequest rreq = new Gson().fromJson("{\"arg1\": \"task1.0\", \"arg2\": \"1\", \"arg3\": \"project1\"}", RenameTaskRequest.class);
     	RenameTaskResponse response = rhandler.handleRequest(rreq, createContext("compute"));
-    	ArrayList<String> tasks = new ArrayList<>();
-    	tasks.add("task1.0");
-    	ArrayList<String> taskIdents = new ArrayList<>();
-    	taskIdents.add("1");
-        Project project = new Project("project1", tasks, new ArrayList<String>(), taskIdents, false);
-		Assert.assertEquals(project.getPid(), response.project.getPid());
-		Assert.assertEquals(project.getTasks().get(0), response.project.getTasks().get(0));
-		Assert.assertEquals(project.getIdentifiers().get(0), response.project.getIdentifiers().get(0));
+    	ArrayList<Task> tasks = new ArrayList<>();
+    	Task task = new Task(1,false, true, new ArrayList<>(), "task1.0", "1", new ArrayList<>());
+    	tasks.add(task);
+        Project project = new Project("project1", tasks, new ArrayList<String>(), false);
+        Assert.assertEquals(project.getPid(), response.project.getPid());
+		Assert.assertEquals(project.getTasks().get(0).getName(), response.project.getTasks().get(0).getName());
+		Assert.assertEquals(project.getTasks().get(0).getTaskIdentifier(), response.project.getTasks().get(0).getTaskIdentifier());
+		Assert.assertEquals(200, response.statusCode);
+    }
+    
+    @Test
+    public void testMarkTaskHandler() throws SQLException {
+    	nuke.nukeDB();
+    	CreateProjectHandler chandler = new CreateProjectHandler();
+    	CreateProjectRequest creq = new Gson().fromJson("{\"arg1\": \"project1\"}", CreateProjectRequest.class);
+    	chandler.handleRequest(creq, createContext("compute"));
+    	AddTaskRequest treq = new Gson().fromJson("{\"arg1\": \"task1\", \"arg2\": \"\", \"arg3\": \"project1\"}", AddTaskRequest.class);
+    	AddTasksHandler thandler = new AddTasksHandler();
+    	thandler.handleRequest(treq, createContext("compute"));
+    	MarkTaskHandler mhandler = new MarkTaskHandler();
+    	MarkTaskRequest mreq = new Gson().fromJson("{\"arg1\": \"project1\", \"arg2\": \"1\"}", MarkTaskRequest.class);
+    	MarkTaskResponse response = mhandler.handleRequest(mreq, createContext("compute"));
+    	ArrayList<Task> tasks = new ArrayList<>();
+    	Task task = new Task(1,true, true, new ArrayList<>(), "task1", "1", new ArrayList<>());
+    	tasks.add(task);
+        Project project = new Project("project1", tasks, new ArrayList<String>(), false);
+        Assert.assertEquals(project.getPid(), response.project.getPid());
+		Assert.assertEquals(project.getTasks().get(0).getName(), response.project.getTasks().get(0).getName());
+		Assert.assertEquals(project.getTasks().get(0).getTaskIdentifier(), response.project.getTasks().get(0).getTaskIdentifier());
+		Assert.assertEquals(project.getTasks().get(0).getIsCompleted(), response.project.getTasks().get(0).getIsCompleted());
 		Assert.assertEquals(200, response.statusCode);
     }
 }
