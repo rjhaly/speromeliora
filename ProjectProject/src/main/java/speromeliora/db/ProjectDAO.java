@@ -226,6 +226,9 @@ public class ProjectDAO {
         	if(!resultSet.next()) {
         		throw new Exception("Failed to add task: could not find project");
         	}	
+        	if(resultSet.getBoolean("isArchived")) {
+        		throw new Exception("Failed to add task: project is archived");
+        	}
         	for(int i = 0; i < tasks.length; i++) {
         		logger.log("creating a new task");
         		Task task = new Task();
@@ -381,6 +384,9 @@ public class ProjectDAO {
                 logger.log("No project with name " + pid);
                 throw new Exception("Unable to retrieve Project: No project with given name");
             }
+            if(resultSet.getBoolean("isArchived")) {
+        		throw new Exception("Failed to add task: project is archived");
+        	}
             else {
             	ps = conn.prepareStatement("SELECT * FROM lookup_table WHERE pid = ? AND tmt_id = ?;");
             	ps.setNString(1, pid);
@@ -417,10 +423,32 @@ public class ProjectDAO {
     
     public Project removeTeammate(String pid, String teammateName) throws Exception {
         try {
-            PreparedStatement ps = conn.prepareStatement("DELETE FROM lookup_table WHERE pid = ? && tmt_id = ?;");
+        	PreparedStatement ps = conn.prepareStatement("SELECT * FROM projects WHERE pid = ?;");
+            ps.setString(1, pid);
+            ResultSet resultSet = ps.executeQuery();
+            
+            // already present?
+            if(!resultSet.next()) {
+                resultSet.close();
+                logger.log("No project with name " + pid);
+                throw new Exception("Unable to retrieve Project: No project with given name");
+            }
+            if(resultSet.getBoolean("isArchived")) {
+        		throw new Exception("Failed to add task: project is archived");
+        	}
+            ps = conn.prepareStatement("DELETE FROM lookup_table WHERE pid = ? && tmt_id = ?;");
             ps.setString(1, pid);
             ps.setNString(2, teammateName);
             ps.execute();
+            ps = conn.prepareStatement("SELECT FROM lookup_table WHERE pid = ? && tmt_id IS NULL;");
+            ps.setNString(1, pid);
+            resultSet = ps.executeQuery();
+            while(resultSet.next()) {
+            	ps = conn.prepareStatement("DELETE FROM lookup_table WHERE pid = tmt_id = ? && tsk_id = ?;");
+            	ps.setNString(1, teammateName);
+            	ps.setInt(2, resultSet.getInt("tsk_id"));
+            	ps.execute();
+            }
             return getProject(pid);
         } catch (Exception e) {
             throw new Exception("Failed to remove teammate: " + e.getMessage());
@@ -429,9 +457,22 @@ public class ProjectDAO {
     
     public Project markTask(String pid, String identifier) throws Exception {
     	try {
-            PreparedStatement ps = conn.prepareStatement("SELECT * FROM lookup_table WHERE pid = ? && tmt_id IS NULL;");
+    		PreparedStatement ps = conn.prepareStatement("SELECT * FROM projects WHERE pid = ?;");
+    		ps.setString(1, pid);
+    		ResultSet resultSet = ps.executeQuery();
+        
+    		// already present?
+    		if(!resultSet.next()) {
+    			resultSet.close();
+    			logger.log("No project with name " + pid);
+    			throw new Exception("Unable to retrieve Project: No project with given name");
+    		}
+    		if(resultSet.getBoolean("isArchived")) {
+    			throw new Exception("Failed to add task: project is archived");
+    		}
+            ps = conn.prepareStatement("SELECT * FROM lookup_table WHERE pid = ? && tmt_id IS NULL;");
             ps.setString(1, pid);
-            ResultSet resultSet = ps.executeQuery();
+            resultSet = ps.executeQuery();
             while(resultSet.next()) {
             	ps = conn.prepareStatement("SELECT * FROM tasks WHERE tsk_id = ?;");
             	ps.setInt(1, resultSet.getInt("tsk_id"));
@@ -440,6 +481,9 @@ public class ProjectDAO {
             		throw new Exception("Failed to mark task: " + "failed to find task");
             	}
             	if(resultSet1.getString("tsk_identifier").equals(identifier)) {
+            		if(!resultSet1.getBoolean("isBottomLevel")) {
+            			throw new Exception("Failed to mark task: not bottom level");
+            		}
             		logger.log("found task to update");
             		ps = conn.prepareStatement("UPDATE tasks SET isComplete = !isComplete WHERE tsk_id = ?;");
             		ps.setInt(1, resultSet.getInt("tsk_id"));
@@ -456,9 +500,22 @@ public class ProjectDAO {
     
     public Project renameTask(String newName, String identifier, String pid) throws Exception {
     	try {
-            PreparedStatement ps = conn.prepareStatement("SELECT * FROM lookup_table WHERE pid = ? && tmt_id IS NULL;");
+    		PreparedStatement ps = conn.prepareStatement("SELECT * FROM projects WHERE pid = ?;");
+    		ps.setString(1, pid);
+    		ResultSet resultSet = ps.executeQuery();
+        
+    		// already present?
+    		if(!resultSet.next()) {
+    			resultSet.close();
+    			logger.log("No project with name " + pid);
+    			throw new Exception("Unable to retrieve Project: No project with given name");
+    		}
+    		if(resultSet.getBoolean("isArchived")) {
+    			throw new Exception("Failed to add task: project is archived");
+    		}
+            ps = conn.prepareStatement("SELECT * FROM lookup_table WHERE pid = ? && tmt_id IS NULL;");
             ps.setString(1, pid);
-            ResultSet resultSet = ps.executeQuery();
+            resultSet = ps.executeQuery();
             while(resultSet.next()) {
             	ps = conn.prepareStatement("SELECT * FROM tasks WHERE tsk_id = ?;");
             	ps.setInt(1, resultSet.getInt("tsk_id"));
@@ -536,8 +593,35 @@ public class ProjectDAO {
     
     public Project deallocateTeammate(String pid, String tmt_id, String identifier) throws Exception {
     	int tsk_id = findTaskID(pid, identifier);
-    	
-    	PreparedStatement ps = conn.prepareStatement("DELETE FROM lookup_table WHERE tsk_id = ? && tmt_id = ?;");
+    	PreparedStatement ps = conn.prepareStatement("SELECT * FROM lookup_table WHERE pid = ? && tmt_id = ?;");
+		ps.setNString(1, pid);
+		ps.setNString(2, tmt_id);
+		ResultSet resultSet = ps.executeQuery();
+		if(resultSet.next()) {
+			throw new Exception("Failed to allocate teammate: teammate not added to specified project");
+		}
+		
+		ps = conn.prepareStatement("SELECT * FROM projects WHERE pid = ?;");
+		ps.setNString(1, pid);
+		resultSet = ps.executeQuery();
+		if(!resultSet.next()) {
+			throw new Exception("Failed to allocate teammate: project does not exist");
+		}
+		if(resultSet.getBoolean("isArchived")) {
+			throw new Exception("Failed to allocate teammate: project is archived");
+		}
+		logger.log("finding taskID");
+		logger.log("found taskID");
+		ps = conn.prepareStatement("SELECT * FROM tasks WHERE tsk_id = ?;");
+		ps.setInt(1, tsk_id);
+		resultSet = ps.executeQuery();
+		if(!resultSet.next()) {
+			throw new Exception("Failed to allocate teammate: task does not exist");
+		}
+		if(!resultSet.getBoolean("isBottomLevel") || resultSet.getBoolean("isComplete")) {
+			throw new Exception("Failed to allocate teammate: task is not applicable to have a teammate added");
+		}
+    	ps = conn.prepareStatement("DELETE FROM lookup_table WHERE tsk_id = ? && tmt_id = ?;");
     	ps.setInt(1, tsk_id);
     	ps.setNString(2, tmt_id);
     	ps.execute();
