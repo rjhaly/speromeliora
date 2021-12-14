@@ -11,18 +11,30 @@
 <script type='text/javascript' src='../js/remove_teammate.js'></script>
 <script type='text/javascript' src='../js/add_tasks.js'></script>
 <script type='text/javascript' src='../js/renameTask.js'></script>
-<script type='text/javascript' src='../js/markTask_NEW.js'></script>
+<script type='text/javascript' src='../js/markTask.js'></script>
 <script type='text/javascript' src='../js/assignteammate.js'></script>
 <script type='text/javascript' src='../js/deassignteammate.js'></script>
 
 
 
 <meta charset="UTF-8">
-<title>PROJECT MANAGER Project View</title>
+<title>PROJECT MANAGER</title>
 
 <script type="text/javascript">
 function initialize() {
-  
+	
+}
+
+function toggleView() {
+	const currentView = document.getElementById("workingView").innerHTML;
+	if (currentView === "projectView") {
+	  document.getElementById("workingView").innerHTML = "teamView";
+	  document.getElementById("viewTitleDisplay").innerHTML = "<h1> Project Manager: <i>Team View</i></h1>";
+	} else {
+	  document.getElementById("workingView").innerHTML = "projectView";
+	  document.getElementById("viewTitleDisplay").innerHTML = "<h1> Project Manager: <i>Project View</i></h1>";
+	}
+	console.log(document.getElementById("workingView").innerHTML);
 }
 </script>
 <style>
@@ -62,10 +74,15 @@ p  {text-align: center;}
 
 </head>
 <body onload="initialize()">
-<div style="visibility: hidden" id= workingProject> </div>
+<div style="visibility: hidden" id="workingProject"></div>
+<div style="visibility: hidden" id="workingView">projectView</div>
 
 
-<h1> Project Manager: <i>Project View</i></h1>
+<div id="viewTitleDisplay"><h1> Project Manager: <i>Project View</i></h1></div>
+
+<p>
+<input type="button" id="toggleViewButton" value="Toggle View" onClick="toggleView(); refreshProjectClick(this)"/>
+</p>
 
 <h2>Create New Project</h2>
 
@@ -111,6 +128,12 @@ p  {text-align: center;}
 <p>Task Identifier: <input name="task"/> Teammate name:<input name="teammatename"/>
   <input type="button" id="assignteammate" value="Assign Teammate" onClick="JavaScript:handleAssingTeammateClick(this)"/>
   <input type="button" id="deassignteammate" value="Deassign Teammate" onClick="JavaScript:handleDeassingTeammateClick(this)"/>
+</p>
+</form>
+
+<form name="MarkTaskForm" method="post">
+<p>Task Identifier: <input name="task"/>
+  <input type="button" id="markTaskButton" value="Mark Task" onClick="JavaScript:handleMarkTaskClick(this)"/>
 </p>
 </form>
 

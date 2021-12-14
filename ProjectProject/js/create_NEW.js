@@ -10,36 +10,43 @@ function processCreateResponse(result) {
   var cons = document.getElementById("consoleMessageDisplay");
   var workingProject = document.getElementById("workingProject");
 
+  var output = "";
   var status = js["statusCode"];
 
   if (status === 200) {
 	// Project output
-	pid = js["project"]["pid"];
-	output = "<p>" + "Project Name: " + pid + "<br>";
+	const pid = js["project"]["pid"];
+	output += "<p>" + "Project Name: " + pid + "<br>";
 	
-	const tsk_ids = js["project"]["identifiers"];
-	const tsk_names = js["project"]["tasks"];
+	const tasks = js["project"]["tasks"];
 	
 	output += "</p><div class=\"left\">";
-	for (let i = 0; i < tsk_ids.length; i++) {
-		identifier = tsk_ids[i];
-		const name = tsk_names[i];
-		getTaskCompletionStatus(); // update tid, isCompleted
+	// Display Tasks
+	for (let i = 0; i < tasks.length; i++) {
+		const task = tasks[i];
+		const identifier = task["taskIdentifier"];
+		const name = task["name"];
 		// count # of . for tabs
 		for (let j = 0; j < identifier.length; j++)
 		  if (identifier.charAt(j) == '.')
-			output += "<span style=\"display:inline-block; width: 40px;\"></span>";
+			output += "<span style='display:inline-block; width: 40px;'></span>";
+		
+		// checkbox for completion status
+		const isCompleted = task["isCompleted"];
+		if (isCompleted) {
+			output += "<img src='checkbox.png'></img>";
+		} else {
+			output += "<img src='uncheckbox.png'></img>";
+		}
+		
 		// display individual task
-		console.log(tid);
-		output += "<input type=\"checkbox\"" + (isCompleted ? "checked" : "unchecked") + " id=\"checkbox" + tid +
-				  "\" onclick=\"JavaScript:getTaskCompletionStatus(); JavaScript:handleMarkTaskClick(this, " + tid + ")\">" +
-				  identifier + ": " + name + "<br>";
+		output += identifier + ": " + name + "<br>";
 	}
 	output += "</div><p>";
 	
 	output +="teammates: " 	  + js["project"]["teammates"] 	+ "<br>" +
 			 "isArchived: "   + js["project"]["isArchived"] + "</p>";
-	// Update Displays
+	// Update computation result
 	workingProject.innerHTML = js["project"]["pid"];
   	cons.innerHTML = "<p>Project successfully created.</p>";
 	proj.innerHTML = output;
@@ -84,28 +91,4 @@ function handleCreateClick(e) {
   };
 }
 
-function getTaskCompletionStatus() {
-  var newURL = getTask_url + "?arg1=" + pid + "&arg2=" + identifier;
-  var xhr = new XMLHttpRequest();
-  xhr.open("GET", newURL, true);
-  xhr.send();
 
-  xhr.onloadend = function () {
-    console.log(xhr);
-    console.log(xhr.request);
-    if (xhr.readyState == XMLHttpRequest.DONE) {
-    	 if (xhr.status == 200) {
-	      console.log ("XHR:" + xhr.responseText);
-	      const js = JSON.parse(xhr.responseText);
-		  tid = js["task"]["taskID"];
-		  isCompleted = js["task"]["isCompleted"];
-		  console.log(tid);
-    	 } else {
-    		 console.log("actual:" + xhr.responseText)
-			  var js = JSON.parse(xhr.responseText);
-			  var err = js["response"];
-			  alert (err);
-    	 }
-    }
-  }
-}
