@@ -115,11 +115,11 @@ function processAddTasksResponse(result) {
 	
 	// Update computation result
 	proj.innerHTML = output;
-	cons.innerHTML = "<p>Console Message Display</p>";
+	cons.innerHTML = "<p>Task was added</p>";
   } else {
 	// Error Output
 	output = js["error"];
-	cons.innerHTML = output;
+	cons.innerHTML = "<p>Unable to add task</p>";
   }
   
 }

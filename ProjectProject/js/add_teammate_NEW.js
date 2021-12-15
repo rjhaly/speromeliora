@@ -116,7 +116,7 @@ function processAddTeammateResponse(result) {
 	
 	// Update computation result
 	proj.innerHTML = output;
-	cons.innerHTML = "<p>Console Message Display</p>";
+	cons.innerHTML = "<p>Teammate as added</p>";
   } else if (js["statusCode"] == 400) {
 	// error output
 	output = js["error"];

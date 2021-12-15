@@ -117,7 +117,7 @@ function processMarkTaskResponse(result) {
 	
 	// Update computation result
 	proj.innerHTML = output;
-	cons.innerHTML = "<p>Task Successfully Renamed</p>";
+	cons.innerHTML = "<p></p>";
   } else if (js["statusCode"] == 400) {
 	output = js["error"];
 	cons.innerHTML = output;

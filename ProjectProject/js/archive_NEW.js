@@ -116,7 +116,7 @@ function processArchive(result) {
 	
 	// Update computation result
 	proj.innerHTML = output;
-	cons.innerHTML = "<p>Console Message Display</p>";
+	cons.innerHTML = "<p>Project is Archive</p>";
   } else if (js["statusCode"] == 400) {
 	// Error Output
 	output = js["error"];
