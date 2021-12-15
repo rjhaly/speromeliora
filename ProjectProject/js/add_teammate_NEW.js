@@ -13,7 +13,7 @@ function processAddTeammateResponse(result) {
   if(js["statusCode"] == 200) {
 	
 	if (workingView.innerHTML === "projectView") {
-	   percentage = 0;
+	   
 		
 		// Project View output
 		const pid = js["project"]["pid"];
@@ -50,14 +50,7 @@ function processAddTeammateResponse(result) {
 		
 		output +="teammates: " 	  + js["project"]["teammates"] 	+ "<br>" +
 				 "isArchived: "   + js["project"]["isArchived"] + "</p>";
-		if (t == 0){
-			percentage = 0;
-		}
-		else {percentage = Math.round(p/t * 100);}
 		
-		console.log( "t = " + t);
-		console.log( "p = " + p);
-		console.log(percentage+"%");
 		
 		
 	} else {
